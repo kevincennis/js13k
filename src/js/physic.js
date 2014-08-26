@@ -53,37 +53,30 @@ var Physics = {
       y = a.pos.y - b.pos.y;
       return r * r > x * x + y * y;
   },
+  // http://en.wikipedia.org/wiki/Inelastic_collision#Formula
   impulse: function( a, b ) {
-    var dotprod,
-    // calculate relative velocity
-    rel_vel_x = b.vel.x - a.vel.x,
-    rel_vel_y = b.vel.y - a.vel.y,
-    // calculate normal position
-    rel_pos_x = b.pos.x - a.pos.x,
-    rel_pos_y = b.pos.y - a.pos.y,
-    // Calculate relative velocity in terms of the normal direction
-    dotprod = rel_vel_x * rel_pos_x + rel_vel_y * rel_pos_y;
-    console.log( dotprod );
-    // Do not resolve if velocities are separating
-    if ( dotprod > 0 ){
-      return;
-    }
+    var cr = Math.min( a.rest, b.rest ),
+      uax = a.vel.x,
+      ubx = b.vel.x,
+      uay = a.vel.y,
+      uby = b.vel.y,
+      ma = a.mass,
+      mb = b.mass,
+      ax, ay, bx, by;
 
-    // Calculate restitution
-    var e = Math.min( a.rest, b.rest );
+    ax = ( ( cr * mb * ( ubx - uax ) ) + ma * uax + mb * ubx ) / ( ma + mb );
+    ay = ( ( cr * mb * ( uby - uay ) ) + ma * uay + mb * uby ) / ( ma + mb );
 
-    // Calculate impulse scalar
-    var j = -(1 + e) * dotprod;
-    // j /= 1 / a.mass + 1 / b.mass;
+    bx = ( ( cr * ma * ( uax - ubx ) ) + mb * ubx + ma * uax ) / ( ma + mb );
+    by = ( ( cr * ma * ( uay - uby ) ) + mb * uby + ma * uay ) / ( ma + mb );
 
-    // Apply impulse
+    a.vel.x = ax;
+    a.vel.y = ay;
 
-    console.log( a.vel.x, j, rel_pos_x );
-    Game.pause();
-    a.vel.subtract( j * rel_pos_x, j * rel_pos_y );
-    // b.vel.add( 1 / b.mass * impulse.x, 1 / b.mass * impulse.y );
+    b.vel.x = bx;
+    b.vel.y = by;
+
   },
-  // render all bodies
   render: function(){
     for ( var i=0, len = Physics.bodies.length; i<len; i++){
       if ( Physics.bodies[i] != null ){
