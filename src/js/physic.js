@@ -4,10 +4,15 @@ var Physics = {
   width: 800,
   height: 400,
   init: function(){
-    this.dom = new SVG('svg');
-    this.dom.attr('width', this.width );
-    this.dom.attr('height', this.height );
-    document.body.appendChild( this.dom.elem );
+    // this.dom = new SVG('svg');
+    // this.dom.attr('width', this.width );
+    // this.dom.attr('height', this.height );
+    // document.body.appendChild( this.dom.elem );
+    this.canvas = document.createElement('canvas');
+    this.canvas.width = this.width;
+    this.canvas.height = this.height;
+    this.ctx = this.canvas.getContext('2d');
+    document.body.appendChild( this.canvas );
   },
   // all interacting objects
   bodies: [],
@@ -78,9 +83,11 @@ var Physics = {
 
   },
   render: function(){
+    this.ctx.clearRect( 0, 0, this.width, this.height );
     for ( var i=0, len = Physics.bodies.length; i<len; i++){
       if ( Physics.bodies[i] != null ){
-        Physics.bodies[i].render();
+        // Physics.bodies[i].render();
+        Physics.bodies[i].draw( this.ctx );
       }
     }
   }
@@ -88,7 +95,8 @@ var Physics = {
 
 // a base class for physics bodies
 var Physic = subclass({
-  r: 8, // radius
+  r: 4, // radius
+  fill: '#137',
   // world registration
   construct: function(){
     // initialize vectors
@@ -103,7 +111,8 @@ var Physic = subclass({
   },
   // no-op, override in subclasses
   init: function( c ){
-    this.create( c );
+    // this.create( c );
+    this.fill = c;
   },
   // inject an svg element
   create: function( c ){
@@ -149,10 +158,20 @@ var Physic = subclass({
       this.vel.x = Math.abs( this.vel.x );
     }
   },
-  // update element position
+  // update svg element position
   render: function(){
     this.dom.attr('cx', this.pos.x );
     this.dom.attr('cy', this.pos.y );
+  },
+  // draw the shape on a canvas context
+  draw: function( ctx ){
+      ctx.beginPath();
+      ctx.arc( this.pos.x, this.pos.y, this.r, 0, 2 * Math.PI, false);
+      ctx.fillStyle = this.fill;
+      ctx.fill();
+      ctx.lineWidth = 1;
+      ctx.strokeStyle = '#000';
+      ctx.stroke();
   },
   // world deregistration
   destruct: function(){
