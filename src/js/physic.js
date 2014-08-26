@@ -27,29 +27,37 @@ var Physics = {
   // time step all bodies in motion
   motion: function( dt ){
     // dt /= 1;
-    Physics.each(function( body ){
-      body.step( dt );
-    });
+    for ( var i=0, len = Physics.bodies.length; i<len; i++){
+      if ( Physics.bodies[i] != null ){
+        Physics.bodies[i].step( dt );
+      }
+    }
   },
   // detect and resolve collisions
   collisions: function(){
-    var checked = {};
-    Physics.each(function( body ){
-      Physics.each(function( obj ){
-        // don't conflict with yourself or if it was already checked
-        if ( body === obj || checked[ obj.index +':'+ body.index ] ){
-          return;
+    var checked = {}, i, j, len = Physics.bodies.length, body, obj;
+    for ( i = 0; i < len; i++ ){
+      if ( Physics.bodies[i] != null ){
+        body = Physics.bodies[i];
+        for ( j = 0; j < len; j++ ){
+          if ( Physics.bodies[j] != null ){
+            obj = Physics.bodies[j];
+            // don't conflict with yourself or if it was already checked
+            if ( body === obj || checked[ obj.index +':'+ body.index ] ){
+              continue;
+            }
+            // collision detected...
+            if ( Physics.overlap( body, obj ) === true ){
+              // console.log( Physics.overlap( body, obj ), body, obj );
+              // body.dom.attr('fill','#731');
+              Physics.impulse( body, obj );
+            }
+            checked[ body.index +':'+ obj.index ] = true;
+          }
         }
-        // collision detected...
-        if ( Physics.overlap( body, obj ) === true ){
-          // console.log( Physics.overlap( body, obj ), body, obj );
-          // body.dom.attr('fill','#731');
-          Physics.impulse( body, obj );
-        }
-        checked[ body.index +':'+ obj.index ] = true;
-      });
-      body.worlds_collide();
-    });
+        body.worlds_collide();
+      }
+    }
   },
   // do two circles overlap?
   overlap: function( a, b ){
