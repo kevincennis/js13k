@@ -110,7 +110,7 @@ var Physic = subclass({
       this.r + Math.random() * ( Physics.height - 2 * this.r )
     );
     this.vel = new Vect( Math.random()/2, Math.random()/2 );
-    this.acc = new Vect( 0, .005 );
+    this.acc = new Vect( 0, 0 );
     this.init.apply( this, arguments );
     this.index = Physics.bodies.push( this ) - 1;
   },
@@ -138,10 +138,10 @@ var Physic = subclass({
     // }
     // else this.vel.y += this.acc.y * dt;
     // calculate the velocity
-    // this.vel.add( this.acc.x * dt, this.acc.y * dt );
+    this.vel.add( this.acc.x * dt, this.acc.y * dt );
     // calculate the position
-        this.pos.add( this.vel.x * dt, this.vel.y * dt );
-        // console.log( this.vel );
+    this.pos.add( this.vel.x * dt, this.vel.y * dt );
+    // console.log( this.vel );
   },
 
   // collide with the world boundaries
@@ -187,6 +187,6 @@ var Physic = subclass({
   vel: { x:0, y:0 }, // velocity
   acc: { x:0, y:0 }, // acceleration
   dens: .5, // density
-  rest: 1, // restitution
+  rest: .95, // restitution
   mass: 1, // mass ( volume * density )
 });
