@@ -1,7 +1,8 @@
 module.exports = [
-  'uglify',
   'concat',
-  'preprocess',
+  'preprocess:js',
+  'uglify',
+  'preprocess:html',
   'connect',
   'blanket_mocha',
   'compare_size'

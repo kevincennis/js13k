@@ -5,7 +5,7 @@
     define( [], factory );
   // otherwise just stick it on the global object
   } else {
-    root.js13k = factory();
+    root.Game = factory();
   }
 
 }( this, function () {

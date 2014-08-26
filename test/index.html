@@ -18,6 +18,9 @@
 
     <script type="text/javascript" src="../node_modules/grunt-blanket-mocha/support/mocha-blanket.js"></script>
 
+    <!-- Function#bind, requestAnimationFrame, etc -->
+    <script src="../test/shims.js"></script>
+
     <script>
 
       // expose chai assertions
@@ -38,8 +41,8 @@
       };
 
       // load main js first, this will load all the script dependencies
-      require(['../dist/js13k.js'], function( js13k ) {
-        window.js13k = js13k;
+      require(['../dist/js13k.js'], function( Game ) {
+        window.Game = Game;
         require(['../test/test'], function() {
           mocha.run();
         });

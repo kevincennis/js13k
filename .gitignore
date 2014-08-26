@@ -2,6 +2,7 @@ node_modules
 *.sizecache.json
 dist
 test/test.js
+test/shims.js
 .DS_Store
 *.log
 src/js/notes.txt

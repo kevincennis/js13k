@@ -1,7 +1,7 @@
-describe('js13k', function() {
+describe('Game', function() {
 
   it('should exist', function() {
-    assert.ok( window.js13k );
+    assert.ok( window.Game );
   });
 
 });
