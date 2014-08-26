@@ -4,3 +4,4 @@ dist
 test/test.js
 .DS_Store
 *.log
+src/js/notes.txt

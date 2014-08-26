@@ -1,5 +1,9 @@
 // @include intro.js
 
-var js13k = {};
+// @include game.js
+// @include util.js
+// @include svg.js
+// @include vect.js
+// @include physic.js
 
 // @include outro.js
