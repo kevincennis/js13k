@@ -83,11 +83,8 @@ var Physics = {
     bx = ( ( cr * ma * ( uax - ubx ) ) + mb * ubx + ma * uax ) / ( ma + mb );
     by = ( ( cr * ma * ( uay - uby ) ) + mb * uby + ma * uay ) / ( ma + mb );
 
-    a.vel.x = ax;
-    a.vel.y = ay;
-
-    b.vel.x = bx;
-    b.vel.y = by;
+    a.vel.set( ax, ay );
+    b.vel.set( bx, by );
 
   },
   render: function(){
