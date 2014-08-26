@@ -100,7 +100,7 @@ var Physics = {
 
 // a base class for physics bodies
 var Physic = subclass({
-  r: 4, // radius
+  r: 8, // radius
   fill: '#137',
   // world registration
   construct: function(){
