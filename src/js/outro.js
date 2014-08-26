@@ -1,3 +1,5 @@
-return js13k;
+Game.start();
+
+return Game;
 
 }));
