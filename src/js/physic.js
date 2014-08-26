@@ -109,14 +109,14 @@ var Physic = subclass({
     this.index = Physics.bodies.push( this ) - 1;
   },
   // no-op, override in subclasses
-  init: function(){
-    this.create();
+  init: function( c ){
+    this.create( c );
   },
   // inject an svg element
-  create: function(){
+  create: function( c ){
     this.dom = new SVG('circle');
     this.dom.attr('r', this.r );
-    this.dom.attr('fill','#137');
+    this.dom.attr('fill', c || '#137');
     Physics.dom.elem.appendChild( this.dom.elem );
   },
   // move the properties a step of time (+/-)

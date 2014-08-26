@@ -44,10 +44,10 @@ var Game = {
     //  new Physic();
     // }
     // simple dead-on collision
-    var obj1 = new Physic();
+    var obj1 = new Physic('#137');
     obj1.pos = new Vect( 100, 100 );
     obj1.vel = new Vect( .25, 0 );
-    var obj2 = new Physic();
+    var obj2 = new Physic('#713');
     obj2.pos = new Vect( 700, 100 );
     obj2.vel = new Vect( -.25, 0 );
   }
