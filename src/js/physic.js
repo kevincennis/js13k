@@ -28,16 +28,20 @@ var Physics = {
   },
   // detect and resolve collisions
   collisions: function(){
+    var checked = {};
     Physics.each(function( body ){
       Physics.each(function( obj ){
-        // don't conflict with yourself
-        if ( body === obj ) return;
+        // don't conflict with yourself or if it was already checked
+        if ( body === obj || checked[ obj.index +':'+ body.index ] ){
+          return;
+        }
         // collision detected...
         if ( Physics.overlap( body, obj ) === true ){
           // console.log( Physics.overlap( body, obj ), body, obj );
-          body.dom.attr('fill','#731');
-          // Physics.impulse( body, obj );
+          // body.dom.attr('fill','#731');
+          Physics.impulse( body, obj );
         }
+        checked[ body.index +':'+ obj.index ] = true;
       });
       body.worlds_collide();
     });
