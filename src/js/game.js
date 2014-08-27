@@ -39,6 +39,9 @@ var Game = {
     reqAnimFrame( Game.loop );
   },
   setup: function(){
+    window.onblur = function(){
+      Game.paused = true;
+    };
     Physics.init();
     while ( Physics.bodies.length < 100 ){
      new Physic('#'+ Math.round( 0x111 + 0xEEE * Math.random() ).toString(16) );
