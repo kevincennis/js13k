@@ -35,24 +35,25 @@ var Physics = {
   },
   // detect and resolve collisions
   collisions: function(){
-    var checked = {}, i, j, len = Physics.bodies.length, body, obj;
+    var i, j, len = Physics.bodies.length, body, obj;
     for ( i = 0; i < len; i++ ){
       if ( Physics.bodies[i] != null ){
         body = Physics.bodies[i];
-        for ( j = 0; j < len; j++ ){
+        for ( j = i + 1; j < len; j++ ){
           if ( Physics.bodies[j] != null ){
             obj = Physics.bodies[j];
-            // don't conflict with yourself or if it was already checked
-            if ( body === obj || checked[ obj.index +':'+ body.index ] ){
+            // don't conflict with yourself
+            if ( body === obj ) {
               continue;
             }
             // collision detected...
             if ( Physics.overlap( body, obj ) === true ){
               // console.log( Physics.overlap( body, obj ), body, obj );
               // body.dom.attr('fill','#731');
+              body.pos.set( body.last.x, body.last.y );
+              obj.pos.set( obj.last.x, obj.last.y );
               Physics.impulse( body, obj );
             }
-            checked[ body.index +':'+ obj.index ] = true;
           }
         }
         body.worlds_collide();
@@ -100,7 +101,7 @@ var Physics = {
 
 // a base class for physics bodies
 var Physic = subclass({
-  r: 4, // radius
+  r: 20, // radius
   fill: '#137',
   // world registration
   construct: function(){
@@ -109,6 +110,7 @@ var Physic = subclass({
       this.r + Math.random() * ( Physics.width - 2 * this.r ),
       this.r + Math.random() * ( Physics.height - 2 * this.r )
     );
+    this.last = new Vect( this.pos.x, this.pos.y );
     this.vel = new Vect( Math.random()/2, Math.random()/2 );
     this.acc = new Vect( 0, 0 );
     this.init.apply( this, arguments );
@@ -139,6 +141,7 @@ var Physic = subclass({
     // else this.vel.y += this.acc.y * dt;
     // calculate the velocity
     this.vel.add( this.acc.x * dt, this.acc.y * dt );
+    this.last.set( this.pos.x, this.pos.y );
     // calculate the position
     this.pos.add( this.vel.x * dt, this.vel.y * dt );
     // console.log( this.vel );
@@ -148,19 +151,23 @@ var Physic = subclass({
   worlds_collide: function(){
     // north
     if ( this.pos.y < this.r ){
-      this.vel.y = Math.abs( this.vel.y );
+      this.vel.y = Math.abs( this.vel.y ) * this.rest;
+      this.pos.y = this.r;
     }
     // south
     if ( this.pos.y > Physics.height - this.r ){
-      this.vel.y = -Math.abs( this.vel.y );
+      this.vel.y = -Math.abs( this.vel.y ) * this.rest;
+      this.pos.y = Physics.height - this.r;
     }
     // east
     if ( this.pos.x > Physics.width - this.r ){
-      this.vel.x = -Math.abs( this.vel.x );
+      this.vel.x = -Math.abs( this.vel.x ) * this.rest;
+      this.pos.x = Physics.width - this.r;
     }
     // west
     if ( this.pos.x < this.r ){
-      this.vel.x = Math.abs( this.vel.x );
+      this.vel.x = Math.abs( this.vel.x ) * this.rest;
+      this.pos.x = this.r;
     }
   },
   // update svg element position

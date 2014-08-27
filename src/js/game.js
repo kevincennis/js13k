@@ -39,10 +39,24 @@ var Game = {
     reqAnimFrame( Game.loop );
   },
   setup: function(){
+    var p, r = Physic.prototype.r * 3, x, y = r, max = 20, i;
+
     Physics.init();
-    while ( Physics.bodies.length < 100 ){
-     new Physic('#'+ Math.round( 0x111 + 0xEEE * Math.random() ).toString(16) );
+
+    // create some new particles and make sure they don't start
+    // out colliding
+    while ( y < Physics.height - r ) {
+      for ( i = 0, x = r; x < Physics.width - r; x += r ) {
+        if ( Physics.bodies.length >= max ) {
+          return;
+        }
+        p = new Physic('#'+ Math.round( 0x111 + 0xEEE * Math.random() ).toString(16) );
+        p.pos.set( x, y );
+        p.last.set( x, y );
+      }
+      y += r;
     }
+
     // simple dead-on collision
     // var obj1 = new Physic('#137');
     // obj1.pos = new Vect( 100, 100 );
