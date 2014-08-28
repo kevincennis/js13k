@@ -35,27 +35,20 @@ var Physics = {
   },
   // detect and resolve collisions
   collisions: function(){
-    var checked = {}, i, j, len = Physics.bodies.length, body, obj;
+    var i, j, len = Physics.bodies.length, obj1, obj2;
     for ( i = 0; i < len; i++ ){
       if ( Physics.bodies[i] != null ){
-        body = Physics.bodies[i];
-        for ( j = 0; j < len; j++ ){
+        obj1 = Physics.bodies[i];
+        for ( j = i + 1; j < len; j++ ){
           if ( Physics.bodies[j] != null ){
-            obj = Physics.bodies[j];
-            // don't conflict with yourself or if it was already checked
-            if ( body === obj || checked[ obj.index +':'+ body.index ] ){
-              continue;
-            }
+            obj2 = Physics.bodies[j];
             // collision detected...
-            if ( Physics.overlap( body, obj ) === true ){
-              // console.log( Physics.overlap( body, obj ), body, obj );
-              // body.dom.attr('fill','#731');
-              Physics.impulse( body, obj );
+            if ( Physics.overlap( obj1, obj2 ) === true ){
+              Physics.impulse( obj1, obj2 );
             }
-            checked[ body.index +':'+ obj.index ] = true;
           }
         }
-        body.worlds_collide();
+        obj1.worlds_collide();
       }
     }
   },

@@ -17,9 +17,9 @@ var Game = {
     else Game.paused = true;
   },
   step: function( delta ){
+    Physics.collisions();
     // update Physics calculations
     Physics.motion( delta );
-    Physics.collisions();
     // update element positions
     Physics.render();
   },
