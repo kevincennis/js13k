@@ -99,6 +99,8 @@ var Physics = {
   },
   render: function(){
     Physics.ctx.clearRect( 0, 0, Physics.width, Physics.height );
+    // Physics.ctx.fillStyle = 'rgba(255,255,255,.2)';
+    // Physics.ctx.fillRect( 0, 0, Physics.width, Physics.height );
     for ( var i=0, len = Physics.bodies.length; i<len; i++){
       if ( Physics.bodies[i] != null ){
         // Physics.bodies[i].render();
@@ -175,16 +177,49 @@ var Physic = subclass({
   },
   // draw the shape on a canvas context
   draw: function( ctx ){
-      ctx.beginPath();
-      ctx.arc( this.pos.x, this.pos.y, this.r, 0, 2 * Math.PI, false);
-      ctx.fillStyle = this.fill;
-      ctx.fill();
-      ctx.lineWidth = 1;
-      ctx.strokeStyle = '#000';
-      ctx.stroke();
+      ctx.drawImage(
+        master_circle( this.r ), // source
+        this.pos.x - this.r, // x pos
+        this.pos.y - this.r // y pos
+      );
   },
   // world deregistration
   destruct: function(){
     delete Physics.bodies[ this.index ];
   }
 });
+
+function master_circle ( r ){
+  if ( !master_circle[r] ){
+    master_circle[r] = document.createElement('canvas');
+    var ctx = master_circle[r].getContext('2d');
+
+    // circle fill...
+    ctx.beginPath();
+    ctx.arc( r, r, r, 0, 2 * Math.PI, false);
+    ctx.fillStyle = 'rgba(11,30,77,.25)';
+    ctx.fill();
+    ctx.closePath();
+    // circle stroke...
+    ctx.beginPath();
+    ctx.arc( r, r, r-1, 0, 2 * Math.PI, false);
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = '#000';
+    ctx.stroke();
+    ctx.closePath();
+    // circle inset...
+    ctx.beginPath();
+    var angle = 2 * Math.PI / 3;
+    ctx.moveTo( r + Math.sin( 0 * angle ) * (r/3), r + Math.cos( 0 * angle ) * (r/3) );
+    ctx.lineTo( r + Math.sin( 1 * angle ) * (r/3), r + Math.cos( 1 * angle ) * (r/3) );
+    ctx.lineTo( r + Math.sin( 2 * angle ) * (r/3), r + Math.cos( 2 * angle ) * (r/3) );
+    ctx.lineTo( r + Math.sin( 0 * angle ) * (r/3), r + Math.cos( 0 * angle ) * (r/3) );
+    ctx.closePath();
+    ctx.lineWidth = 2;
+    ctx.lineJoin = 'round';
+    ctx.strokeStyle = '#000';
+    ctx.stroke();
+  }
+  return master_circle[r];
+}
+
