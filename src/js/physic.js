@@ -110,17 +110,28 @@ var Physics = {
 
 // a base class for physics bodies
 var Physic = subclass({
-  r: 8, // radius
-  fill: '#137',
+
+  // physical properties
+  r: 32, // radius
+  pos: { x:0, y:0 }, // position - coordinate vector
+  vel: { x:0, y:0 }, // velocity - change in position
+  acc: { x:0, y:0 }, // acceleration - change in velocity
+  force: { x:0, y:0 }, // additional applied forces
+  dens: .5, // density
+  rest: 1, // restitution
+  mass: 1, // mass ( volume * density )
+
   // world registration
-  construct: function(){
+  construct: function(r){
+    this.r = r || this.r;
     // initialize vectors
     this.pos = new Vect(
       this.r + Math.random() * ( Physics.width - 2 * this.r ),
       this.r + Math.random() * ( Physics.height - 2 * this.r )
     );
-    this.vel = new Vect( Math.random()/2, Math.random()/2 );
+    this.vel = new Vect( Math.random()/2-.25, Math.random()/2-.25 );
     this.acc = new Vect( 0, 0 );
+    this.force = new Vect( 0, 0 );
     this.init.apply( this, arguments );
     this.index = Physics.bodies.push( this ) - 1;
   },
@@ -129,20 +140,13 @@ var Physic = subclass({
 
   // move the properties a step of time (+/-)
   step: function( dt ){
-    // calculate the velocity
-    // if ( Math.abs( this.vel.x ) < 1e-2 ){
-    //  this.vel.x = 0;
-    // }
-    // else this.vel.x += this.acc.x * dt;
-    // if ( Math.abs( this.vel.y ) < 1e-2 ){
-    //  this.vel.y = 0;
-    // }
-    // else this.vel.y += this.acc.y * dt;
-    // calculate the velocity
-    this.vel.add( this.acc.x * dt, this.acc.y * dt );
-    // calculate the position
-    this.pos.add( this.vel.x * dt, this.vel.y * dt );
+    // calculate any change in velocity
+    this.vel.add( this.acc.x, this.acc.y );
+    // calculate the change in position
+    this.pos.add( this.vel.x * dt + this.force.x, this.vel.y * dt + this.force.y );
     // console.log( this.vel );
+    this.force.x = 0;
+    this.force.y = 0;
   },
 
   // collide with the world boundaries
@@ -182,12 +186,5 @@ var Physic = subclass({
   // world deregistration
   destruct: function(){
     delete Physics.bodies[ this.index ];
-  },
-  // physical properties
-  pos: { x:0, y:0 }, // position
-  vel: { x:0, y:0 }, // velocity
-  acc: { x:0, y:0 }, // acceleration
-  dens: .5, // density
-  rest: .95, // restitution
-  mass: 1, // mass ( volume * density )
+  }
 });

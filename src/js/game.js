@@ -43,16 +43,20 @@ var Game = {
       Game.paused = true;
     };
     Physics.init();
-    while ( Physics.bodies.length < 100 ){
-     new Physic('#'+ Math.round( 0x111 + 0xEEE * Math.random() ).toString(16) );
+    var r = 16;
+    while ( Physics.bodies.length < 50 ){
+     new Physic(r);
     }
     // simple dead-on collision
-    // var obj1 = new Physic('#137');
-    // obj1.pos = new Vect( 100, 100 );
-    // obj1.vel = new Vect( .25, 0 );
-    // var obj2 = new Physic('#713');
-    // obj2.pos = new Vect( 700, 100 );
-    // obj2.vel = new Vect( -.25, 0 );
+    var obj1 = new Physic(r);
+    obj1.pos = new Vect( 256, 256 );
+    obj1.vel = new Vect( .25, 0 );
+    var obj2 = new Physic(r);
+    obj2.pos = new Vect( 512, 224 );
+    obj2.vel = new Vect( 0, 0 );
+    // var obj3 = new Physic();
+    // obj3.pos = new Vect( 768, 256 );
+    // obj3.vel = new Vect( 0, 0 );
   }
 };
 
