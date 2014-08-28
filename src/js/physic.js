@@ -4,10 +4,6 @@ var Physics = {
   width: 1024,
   height: 512,
   init: function(){
-    // this.dom = new SVG('svg');
-    // this.dom.attr('width', this.width );
-    // this.dom.attr('height', this.height );
-    // document.body.appendChild( this.dom.elem );
     Physics.canvas = document.createElement('canvas');
     document.body.appendChild( Physics.canvas );
     Physics.canvas.width = Physics.width;
@@ -45,14 +41,6 @@ var Physics = {
   },
   // all interacting objects
   bodies: [],
-  // iterate all bodies
-  each: function( callback ){
-    for ( var i=0, len = Physics.bodies.length; i<len; i++){
-      if ( Physics.bodies[i] != null ){
-        callback( Physics.bodies[i], i );
-      }
-    }
-  },
   // time step all bodies in motion
   motion: function( dt ){
     // dt /= 1;
@@ -137,17 +125,8 @@ var Physic = subclass({
     this.index = Physics.bodies.push( this ) - 1;
   },
   // no-op, override in subclasses
-  init: function( c ){
-    // this.create( c );
-    this.fill = c;
-  },
-  // inject an svg element
-  create: function( c ){
-    this.dom = new SVG('circle');
-    this.dom.attr('r', this.r );
-    this.dom.attr('fill', c || '#137');
-    Physics.dom.elem.appendChild( this.dom.elem );
-  },
+  init: function(){ },
+
   // move the properties a step of time (+/-)
   step: function( dt ){
     // calculate the velocity
