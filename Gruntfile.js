@@ -3,6 +3,8 @@ module.exports = function( grunt ) {
   grunt.initConfig({
     // read package.json
     pkg: grunt.file.readJSON('package.json'),
+    // auto-build on /src changes
+    watch: require('./build/config/watch'),
     // minify
     uglify: require('./build/config/uglify'),
     // concat
