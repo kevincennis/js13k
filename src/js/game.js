@@ -3,7 +3,7 @@ var Game = {
   start: function(){
     Game.setup();
     // the intial timestamp
-    Game.started = Date.now();
+    Game.started = 0;
     // begin time stepping...
     Game.pause();
   },
@@ -11,8 +11,8 @@ var Game = {
   pause: function(){
     if ( Game.paused ){
       Game.paused = false;
-      Game.ticked = Date.now();
-      Game.loop();
+      Game.ticked = 0;
+      reqAnimFrame( Game.loop );
     }
     else Game.paused = true;
   },
@@ -23,18 +23,16 @@ var Game = {
     // update element positions
     Physics.render();
   },
-  loop: function(){
+  loop: function( timestamp ){
     if ( Game.paused ){
       return;
     }
-    var now = Date.now(), delta;
-    // console.log( now );
     if ( Game.ticked ){
       // how much time has elapsed
-      delta = now - Game.ticked;
+      delta = timestamp - Game.ticked;
       Game.step( delta );
     }
-    Game.ticked = now;
+    Game.ticked = timestamp;
     // recurse...
     reqAnimFrame( Game.loop );
   },
