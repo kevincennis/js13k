@@ -80,8 +80,35 @@ var Physics = {
   impulse: function( a, b ) {
 
 
-    var cr = Math.min( a.rest, b.rest );
 
+    // Calculate relative velocity
+
+    var pos_norm = a.pos.clone().sub( b.pos ).norm();
+
+    // Calculate relative velocity in terms of the normal direction
+    var velAlongNormal = pos_norm.dot( a.vel.clone().sub( b.vel ) );
+
+    // Do not resolve if velocities are separating
+    if ( velAlongNormal > 0 ){
+      return;
+    }
+    // Calculate restitution
+    var e = Math.min( a.rest, b.rest );
+
+    // Calculate impulse scalar
+    var j = -( 1 + e ) * velAlongNormal;
+    j /= 1 / a.mass + 1 / b.mass;
+
+    // Apply impulse
+    var impulse = pos_norm.clone().mult( j );
+    a.vel.add( impulse.clone().mult( 1 / a.mass ) );
+    b.vel.sub( impulse.clone().mult( 1 / b.mass ) );
+    if ( velAlongNormal == 0 ){
+      a.force.set( pos_norm.x, pos_norm.y );
+      b.force.set( -pos_norm.x, -pos_norm.y );
+    }
+   /*
+    var cr = Math.min( a.rest, b.rest );
     var unit_normal = a.pos.clone().sub( b.pos ).norm(),
     unit_tangent = unit_normal.clone().rotate();
 
@@ -104,6 +131,7 @@ var Physics = {
     a.force.set( unit_normal.x, unit_normal.y );
     b.force.set( -unit_normal.x, -unit_normal.y );
     // Game.pause();
+*/
   },
   render: function(){
     Physics.ctx.clearRect( 0, 0, Physics.width, Physics.height );
@@ -128,8 +156,8 @@ var Physic = subclass({
   acc: { x:0, y:0 }, // acceleration - change in velocity
   force: { x:0, y:0 }, // additional applied forces
   dens: .5, // density
-  rest: .75, // restitution
-  mass: 1, // mass ( volume * density )
+  rest: 1, // restitution
+  mass: null, // mass ( volume * density ) calculated
 
   // world registration
   construct: function(r){
@@ -140,7 +168,7 @@ var Physic = subclass({
       this.r + Math.random() * ( Physics.width - 2 * this.r ),
       this.r + Math.random() * ( Physics.height - 2 * this.r )
     );
-    this.vel = new Vect();// Math.random()/2-.25, Math.random()/2-.25 );
+    this.vel = new Vect( Math.random()/2-.25, Math.random()/2-.25 );
     this.acc = new Vect( 0, 0 );
     this.force = new Vect( 0, 0 );
     this.init.apply( this, arguments );
