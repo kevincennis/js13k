@@ -1,18 +1,47 @@
 
 // physics manager
 var Physics = {
-  width: 800,
-  height: 400,
+  width: 1024,
+  height: 512,
   init: function(){
     // this.dom = new SVG('svg');
     // this.dom.attr('width', this.width );
     // this.dom.attr('height', this.height );
     // document.body.appendChild( this.dom.elem );
-    this.canvas = document.createElement('canvas');
-    this.canvas.width = this.width;
-    this.canvas.height = this.height;
-    this.ctx = this.canvas.getContext('2d');
-    document.body.appendChild( this.canvas );
+    Physics.canvas = document.createElement('canvas');
+    document.body.appendChild( Physics.canvas );
+    Physics.canvas.width = Physics.width;
+    Physics.canvas.height = Physics.height;
+    Physics.canvas.style.position = 'absolute';
+    Physics.canvas.style.top = '1px';
+    Physics.canvas.style.left = '1px';
+    Physics.canvas.style.zIndex = 2;
+    Physics.ctx = Physics.canvas.getContext('2d');
+    // draw a separate background canvas...
+    Physics.bgcanvas = document.createElement('canvas');
+    document.body.appendChild( Physics.bgcanvas );
+    Physics.bgcanvas.width = Physics.width+2;
+    Physics.bgcanvas.height = Physics.height+2;
+    Physics.bgcanvas.style.position = 'absolute';
+    Physics.bgcanvas.style.top = '0px';
+    Physics.bgcanvas.style.left = '0px';
+    Physics.bgcanvas.style.zIndex = 1;
+    var bg = Physics.bgcanvas.getContext('2d');
+    bg.beginPath();
+    // vertical lines
+    for ( var i = 1; i < Physics.width+2; i+=32 ){
+      bg.moveTo( i, 0 );
+      bg.lineTo( i, Physics.height );
+    }
+    // horizontal lines
+    for ( var i = 1; i < Physics.height+2; i+=32 ){
+      bg.moveTo( 0, i );
+      bg.lineTo( Physics.width, i );
+    }
+    bg.lineWidth = .5;
+    bg.strokeStyle = 'rgba(0,0,0,.25)';
+    bg.stroke();
+    bg.closePath();
   },
   // all interacting objects
   bodies: [],
@@ -81,11 +110,11 @@ var Physics = {
 
   },
   render: function(){
-    this.ctx.clearRect( 0, 0, this.width, this.height );
+    Physics.ctx.clearRect( 0, 0, Physics.width, Physics.height );
     for ( var i=0, len = Physics.bodies.length; i<len; i++){
       if ( Physics.bodies[i] != null ){
         // Physics.bodies[i].render();
-        Physics.bodies[i].draw( this.ctx );
+        Physics.bodies[i].draw( Physics.ctx );
       }
     }
   }
