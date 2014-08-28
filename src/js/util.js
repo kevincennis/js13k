@@ -29,9 +29,9 @@ function subclass (){
     var obj = this instanceof Class ? this : Object.create( Class.prototype );
     return obj.construct.apply( obj, arguments ) || obj;
   };
-  // if the current scope is a constructor, instantiate it
-  // and set it as the subclass prototype, for inheritance
-  Class.prototype = typeof this == 'function' ? new this : {};
+  // if the current scope is a constructor, set up the inheritance chain
+  Class.prototype = typeof this == 'function' ?
+    Object.create( this.prototype ) : {};
   // extend the prototype with any arguments, as mixins
   extend.apply( Class.prototype, arguments );
   // static method for reproduction
