@@ -228,6 +228,8 @@ var Physic = subclass({
 function master_circle ( r ){
   if ( !master_circle[r] ){
     master_circle[r] = document.createElement('canvas');
+    master_circle[r].width = r * 2;
+    master_circle[r].height = r * 2;
     var ctx = master_circle[r].getContext('2d');
 
     // circle fill...
