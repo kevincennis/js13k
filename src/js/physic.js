@@ -78,24 +78,32 @@ var Physics = {
   },
   // http://en.wikipedia.org/wiki/Inelastic_collision#Formula
   impulse: function( a, b ) {
-    var cr = Math.min( a.rest, b.rest ),
-      uax = a.vel.x,
-      ubx = b.vel.x,
-      uay = a.vel.y,
-      uby = b.vel.y,
-      ma = a.mass,
-      mb = b.mass,
-      ax, ay, bx, by;
 
-    ax = ( ( cr * mb * ( ubx - uax ) ) + ma * uax + mb * ubx ) / ( ma + mb );
-    ay = ( ( cr * mb * ( uby - uay ) ) + ma * uay + mb * uby ) / ( ma + mb );
 
-    bx = ( ( cr * ma * ( uax - ubx ) ) + mb * ubx + ma * uax ) / ( ma + mb );
-    by = ( ( cr * ma * ( uay - uby ) ) + mb * uby + ma * uay ) / ( ma + mb );
+    var cr = Math.min( a.rest, b.rest );
 
-    a.vel.set( ax, ay );
-    b.vel.set( bx, by );
+    var unit_normal = a.pos.clone().sub( b.pos ).norm(),
+    unit_tangent = unit_normal.clone().rotate();
 
+    var anorm = unit_normal.dot( a.vel );
+    var bnorm = unit_normal.dot( b.vel );
+
+    var anorm2 = cr * ( anorm * (a.mass - b.mass) + 2 * b.mass * bnorm) / (a.mass + b.mass);
+    var bnorm2 = cr * ( bnorm * (b.mass - a.mass) + 2 * a.mass * anorm) / (a.mass + b.mass);
+
+    var avect1 = unit_normal.clone().mult( anorm2 );
+    var bvect1 = unit_normal.clone().mult( bnorm2 );
+
+    var avect2 = unit_tangent.clone().mult( unit_tangent.dot( a.vel ) );
+    var bvect2 = unit_tangent.clone().mult( unit_tangent.dot( b.vel ) );
+
+    a.vel = avect1.add( avect2 );
+    b.vel = bvect1.add( bvect2 );
+
+    // positional correction of overlaps
+    a.force.set( unit_normal.x, unit_normal.y );
+    b.force.set( -unit_normal.x, -unit_normal.y );
+    // Game.pause();
   },
   render: function(){
     Physics.ctx.clearRect( 0, 0, Physics.width, Physics.height );
@@ -120,18 +128,19 @@ var Physic = subclass({
   acc: { x:0, y:0 }, // acceleration - change in velocity
   force: { x:0, y:0 }, // additional applied forces
   dens: .5, // density
-  rest: 1, // restitution
+  rest: .75, // restitution
   mass: 1, // mass ( volume * density )
 
   // world registration
   construct: function(r){
     this.r = r || this.r;
+    this.mass = Math.PI * this.r * this.r * this.dens;
     // initialize vectors
     this.pos = new Vect(
       this.r + Math.random() * ( Physics.width - 2 * this.r ),
       this.r + Math.random() * ( Physics.height - 2 * this.r )
     );
-    this.vel = new Vect( Math.random()/2-.25, Math.random()/2-.25 );
+    this.vel = new Vect();// Math.random()/2-.25, Math.random()/2-.25 );
     this.acc = new Vect( 0, 0 );
     this.force = new Vect( 0, 0 );
     this.init.apply( this, arguments );
@@ -143,9 +152,9 @@ var Physic = subclass({
   // move the properties a step of time (+/-)
   step: function( dt ){
     // calculate any change in velocity
-    this.vel.add( this.acc.x, this.acc.y );
+    this.vel.add( this.acc );
     // calculate the change in position
-    this.pos.add( this.vel.x * dt + this.force.x, this.vel.y * dt + this.force.y );
+    this.pos.add( this.vel.clone().mult( dt ) ).add( this.force );
     // console.log( this.vel );
     this.force.x = 0;
     this.force.y = 0;
@@ -156,24 +165,23 @@ var Physic = subclass({
     // north
     if ( this.pos.y < this.r ){
       this.vel.y = Math.abs( this.vel.y );
+      this.force.y = this.r - this.pos.y;
     }
     // south
     if ( this.pos.y > Physics.height - this.r ){
       this.vel.y = -Math.abs( this.vel.y );
+      this.force.y = Physics.height - this.r - this.pos.y;
     }
     // east
     if ( this.pos.x > Physics.width - this.r ){
       this.vel.x = -Math.abs( this.vel.x );
+      this.force.x = Physics.width - this.r - this.pos.x;
     }
     // west
     if ( this.pos.x < this.r ){
       this.vel.x = Math.abs( this.vel.x );
+      this.force.x = this.r - this.pos.x;
     }
-  },
-  // update svg element position
-  render: function(){
-    this.dom.attr('cx', this.pos.x );
-    this.dom.attr('cy', this.pos.y );
   },
   // draw the shape on a canvas context
   draw: function( ctx ){
@@ -209,16 +217,16 @@ function master_circle ( r ){
     ctx.closePath();
     // circle inset...
     ctx.beginPath();
-    var angle = 2 * Math.PI / 3;
-    ctx.moveTo( r + Math.sin( 0 * angle ) * (r/3), r + Math.cos( 0 * angle ) * (r/3) );
-    ctx.lineTo( r + Math.sin( 1 * angle ) * (r/3), r + Math.cos( 1 * angle ) * (r/3) );
-    ctx.lineTo( r + Math.sin( 2 * angle ) * (r/3), r + Math.cos( 2 * angle ) * (r/3) );
-    ctx.lineTo( r + Math.sin( 0 * angle ) * (r/3), r + Math.cos( 0 * angle ) * (r/3) );
-    ctx.closePath();
-    ctx.lineWidth = 2;
-    ctx.lineJoin = 'round';
-    ctx.strokeStyle = '#000';
-    ctx.stroke();
+    // var angle = 2 * Math.PI / 3;
+    // ctx.moveTo( r + Math.sin( 0 * angle ) * (r/3), r + Math.cos( 0 * angle ) * (r/3) );
+    // ctx.lineTo( r + Math.sin( 1 * angle ) * (r/3), r + Math.cos( 1 * angle ) * (r/3) );
+    // ctx.lineTo( r + Math.sin( 2 * angle ) * (r/3), r + Math.cos( 2 * angle ) * (r/3) );
+    // ctx.lineTo( r + Math.sin( 0 * angle ) * (r/3), r + Math.cos( 0 * angle ) * (r/3) );
+    // ctx.closePath();
+    // ctx.lineWidth = 2;
+    // ctx.lineJoin = 'round';
+    // ctx.strokeStyle = '#000';
+    // ctx.stroke();
   }
   return master_circle[r];
 }

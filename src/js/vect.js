@@ -14,18 +14,43 @@ var Vect = subclass({
     }
     return this;
   },
-  add: function( x, y ){
-    return this.set( this.x + x, this.y + y );
+  // addition
+  add: function( vect ){
+    return this.set( this.x + vect.x, this.y + vect.y );
   },
-  subtract: function( x, y ){
-    return this.set( this.x - x, this.y - y );
+  // subtraction
+  sub: function( vect ){
+    return this.set( this.x - vect.x, this.y - vect.y );
   },
-  multiply: function( x, y ){
-    return this.set( this.x * x, this.y * y );
+  // multiply by scalar
+  mult: function( f ){
+    return this.set( this.x * f, this.y * f );
   },
-  divide: function( x, y ){
-    return this.set( this.x / x, this.y / y );
+  // divide by scalar
+  div: function( d ){
+    return this.set( this.x / d, this.y / d );
   },
+  // magnitude
+  length: function(){
+    return Math.sqrt( this.x * this.x + this.y * this.y );
+  },
+  // normalize to a unit vector
+  norm: function(){
+    var len = this.length();
+    return this.set(
+      this.x / len,
+      this.y / len
+    );
+  },
+  // rotate the vector to perpindicular
+  rotate: function(){
+    return this.set( -this.y, this.x );
+  },
+  // dot product
+  dot: function( vect ){
+    return this.x * vect.x + this.y * vect.y;
+  },
+  // copy into a new vector instance
   clone: function(){
     return new Vect( this.x, this.y );
   }
