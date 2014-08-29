@@ -26,7 +26,8 @@ function extend (){
 function subclass (){
   // subclass constructor
   function Class (){
-    this.construct.apply( this, arguments );
+    var obj = this instanceof Class ? this : Object.create( Class.prototype );
+    return obj.construct.apply( obj, arguments ) || obj;
   };
   // if the current scope is a constructor, instantiate it
   // and set it as the subclass prototype, for inheritance

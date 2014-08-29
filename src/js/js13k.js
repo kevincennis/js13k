@@ -1,6 +1,7 @@
 // @include intro.js
 
 // @include game.js
+// @include level.js
 // @include util.js
 // @include vect.js
 // @include physic.js

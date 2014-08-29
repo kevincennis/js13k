@@ -42,21 +42,38 @@ var Game = {
       Game.paused = true;
     };
     Physics.init();
-    var r = 16;
-    while ( Physics.bodies.length < 50 ){
-     new Physic(r);
-    }
+    Render.init();
+    Game.load( level[1] );
+    var r = 32;
+    // while ( Physics.bodies.length < 400 ){
+    //  new Physic(r);
+    // }
     // simple dead-on collision
-    var obj1 = new Physic(r);
-    obj1.pos = new Vect( 256, 256 );
-    obj1.vel = new Vect( .25, 0 );
-    var obj2 = new Physic(r);
-    obj2.pos = new Vect( 512, 224 );
-    obj2.vel = new Vect( 0, 0 );
-    // var obj3 = new Physic();
-    // obj3.pos = new Vect( 768, 256 );
-    // obj3.vel = new Vect( 0, 0 );
+    var obj1 = new Physic( 768, 256, r );
+    obj1.vel.set( -1, 0 );
+  },
+  // render a level...
+  load: function( arr ){
+    // for ( var i = 0; i < arr.length; i++ ){
+    //   Physic.apply( this, arr[i] );
+    // }
+    var r = 32, w = 16, h = 8, y, x;
+    // row...
+    for ( y = 0; y < h; y++ ){
+      // column...
+      for ( x = 0; x <= w; x++ ){
+        // bitmask...
+        if ( arr[ y ] & ( 1 << x ) ){
+          new Physic(
+            x * 2 * r + r,
+            y * 2 * r + r,
+            r
+          );
+        }
+      }
+    }
   }
+
 };
 
 // animation
