@@ -41,17 +41,8 @@ var Physics = {
   },
   // all interacting objects
   bodies: [],
-  // time step all bodies in motion
+  // time step all bodies in motion, detect and resolve collisions
   motion: function( dt ){
-    // dt /= 1;
-    for ( var i=0, len = Physics.bodies.length; i<len; i++){
-      if ( Physics.bodies[i] != null ){
-        Physics.bodies[i].step( dt );
-      }
-    }
-  },
-  // detect and resolve collisions
-  collisions: function(){
     var i, j, len = Physics.bodies.length, obj1, obj2;
     for ( i = 0; i < len; i++ ){
       if ( Physics.bodies[i] != null ){
@@ -97,53 +88,24 @@ var Physics = {
 
     // Calculate impulse scalar
     var j = -( 1 + e ) * velAlongNormal;
-    j /= 1 / a.mass + 1 / b.mass;
+    j /= a.inv_mass + b.inv_mass;
 
     // Apply impulse
     var impulse = pos_norm.clone().mult( j );
-    a.vel.add( impulse.clone().mult( 1 / a.mass ) );
-    b.vel.sub( impulse.clone().mult( 1 / b.mass ) );
-    if ( velAlongNormal == 0 ){
-      a.force.set( pos_norm.x, pos_norm.y );
-      b.force.set( -pos_norm.x, -pos_norm.y );
-    }
-   /*
-    var cr = Math.min( a.rest, b.rest );
-    var unit_normal = a.pos.clone().sub( b.pos ).norm(),
-    unit_tangent = unit_normal.clone().rotate();
+    a.vel.add( impulse.clone().mult( a.inv_mass ) );
+    b.vel.sub( impulse.clone().mult( b.inv_mass ) );
+    // position correction for overlaps
+    var percent = 0.5, // usually 20% to 80%
+    slop = 0.1, // usually 0.01 to 0.1
+    penetration = a.r + b.r - a.pos.clone().sub( b.pos ).length(),
+    depth = Math.max( penetration - slop, slop ),
+    correction = pos_norm.mult( ( depth / ( a.inv_mass + b.inv_mass ) ) * percent );
 
-    var anorm = unit_normal.dot( a.vel );
-    var bnorm = unit_normal.dot( b.vel );
+    a.force.add( correction.clone().mult( a.inv_mass ) );
+    b.force.sub( correction.clone().mult( b.inv_mass ) );
 
-    var anorm2 = cr * ( anorm * (a.mass - b.mass) + 2 * b.mass * bnorm) / (a.mass + b.mass);
-    var bnorm2 = cr * ( bnorm * (b.mass - a.mass) + 2 * a.mass * anorm) / (a.mass + b.mass);
-
-    var avect1 = unit_normal.clone().mult( anorm2 );
-    var bvect1 = unit_normal.clone().mult( bnorm2 );
-
-    var avect2 = unit_tangent.clone().mult( unit_tangent.dot( a.vel ) );
-    var bvect2 = unit_tangent.clone().mult( unit_tangent.dot( b.vel ) );
-
-    a.vel = avect1.add( avect2 );
-    b.vel = bvect1.add( bvect2 );
-
-    // positional correction of overlaps
-    a.force.set( unit_normal.x, unit_normal.y );
-    b.force.set( -unit_normal.x, -unit_normal.y );
-    // Game.pause();
-*/
-  },
-  render: function(){
-    Physics.ctx.clearRect( 0, 0, Physics.width, Physics.height );
-    // Physics.ctx.fillStyle = 'rgba(255,255,255,.2)';
-    // Physics.ctx.fillRect( 0, 0, Physics.width, Physics.height );
-    for ( var i=0, len = Physics.bodies.length; i<len; i++){
-      if ( Physics.bodies[i] != null ){
-        // Physics.bodies[i].render();
-        Physics.bodies[i].draw( Physics.ctx );
-      }
-    }
   }
+
 };
 
 // a base class for physics bodies
@@ -153,24 +115,22 @@ var Physic = subclass({
   r: 32, // radius
   pos: { x:0, y:0 }, // position - coordinate vector
   vel: { x:0, y:0 }, // velocity - change in position
-  acc: { x:0, y:0 }, // acceleration - change in velocity
   force: { x:0, y:0 }, // additional applied forces
   dens: .5, // density
-  rest: 1, // restitution
+  rest: .75, // restitution
+  fric: .005, // friction
   mass: null, // mass ( volume * density ) calculated
 
   // world registration
-  construct: function(r){
+  construct: function( x, y, r ){
     this.r = r || this.r;
     this.mass = Math.PI * this.r * this.r * this.dens;
+    this.inv_mass = 1 / this.mass;
     // initialize vectors
-    this.pos = new Vect(
-      this.r + Math.random() * ( Physics.width - 2 * this.r ),
-      this.r + Math.random() * ( Physics.height - 2 * this.r )
-    );
-    this.vel = new Vect( Math.random()/2-.25, Math.random()/2-.25 );
-    this.acc = new Vect( 0, 0 );
-    this.force = new Vect( 0, 0 );
+    this.pos = new Vect( x, y );
+    this.vel = new Vect(0,0);
+    this.acc = new Vect(0,0);
+    this.force = new Vect(0,0);
     this.init.apply( this, arguments );
     this.index = Physics.bodies.push( this ) - 1;
   },
@@ -179,10 +139,14 @@ var Physic = subclass({
 
   // move the properties a step of time (+/-)
   step: function( dt ){
-    // calculate any change in velocity
-    this.vel.add( this.acc );
-    // calculate the change in position
-    this.pos.add( this.vel.clone().mult( dt ) ).add( this.force );
+    // the object is moving...
+    if ( this.vel.dot() > 0 ){
+      // apply a change in velocity due to friction
+      this.vel.mult( 1-this.fric ).min( 1e-3 );
+      // calculate the change in position
+      this.pos.add( this.vel.clone().mult( dt ) );
+    }
+    this.pos.add( this.force );
     // console.log( this.vel );
     this.force.x = 0;
     this.force.y = 0;

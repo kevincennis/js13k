@@ -7,12 +7,24 @@ var Vect = subclass({
   },
   set: function( x, y ){
     if ( isNum( x ) ){
-      this.x = _num( x, 0, Physics.width );
+      this.x = _num( x );
     }
     if ( isNum( y ) ){
-      this.y = _num( y, 0, Physics.height );
+      this.y = _num( y );
     }
     return this;
+  },
+  min: function( n ){
+    this.set(
+      Math.abs( this.x ) <= n ? 0 : this.x,
+      Math.abs( this.y ) <= n ? 0 : this.y
+    );
+  },
+  max: function( n ){
+    this.set(
+      Math.abs( this.x ) >= n ? 0 : this.x,
+      Math.abs( this.y ) >= n ? 0 : this.y
+    );
   },
   // addition
   add: function( vect ){
@@ -37,10 +49,10 @@ var Vect = subclass({
   // normalize to a unit vector
   norm: function(){
     var len = this.length();
-    return this.set(
+    return len ? this.set(
       this.x / len,
       this.y / len
-    );
+    ) : this;
   },
   // rotate the vector to perpindicular
   rotate: function(){
@@ -48,6 +60,7 @@ var Vect = subclass({
   },
   // dot product
   dot: function( vect ){
+    vect = vect || this;
     return this.x * vect.x + this.y * vect.y;
   },
   // copy into a new vector instance
@@ -57,7 +70,7 @@ var Vect = subclass({
 });
 
 // ensure valid vector values
-function _num ( n, min, max ){
+function _num ( n ){
   // validate the value
   if ( isNaN( n ) === true ){
     throw new Error('NaN in Vect');
