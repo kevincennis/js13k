@@ -165,33 +165,35 @@ var Physic = subclass({
 
 function master_circle ( r ){
   if ( !master_circle[r] ){
-    master_circle[r] = new Canvas().draw(function( ctx ){
-      // circle fill...
-      ctx.beginPath();
-      ctx.arc( r, r, r, 0, 2 * Math.PI, false);
-      ctx.fillStyle = 'rgba(11,30,77,.25)';
-      ctx.fill();
-      ctx.closePath();
-      // circle stroke...
-      ctx.beginPath();
-      ctx.arc( r, r, r-1, 0, 2 * Math.PI, false);
-      ctx.lineWidth = 2;
-      ctx.strokeStyle = '#000';
-      ctx.stroke();
-      ctx.closePath();
-      // circle inset...
-      ctx.beginPath();
-      // var angle = 2 * Math.PI / 3;
-      // ctx.moveTo( r + Math.sin( 0 * angle ) * (r/3), r + Math.cos( 0 * angle ) * (r/3) );
-      // ctx.lineTo( r + Math.sin( 1 * angle ) * (r/3), r + Math.cos( 1 * angle ) * (r/3) );
-      // ctx.lineTo( r + Math.sin( 2 * angle ) * (r/3), r + Math.cos( 2 * angle ) * (r/3) );
-      // ctx.lineTo( r + Math.sin( 0 * angle ) * (r/3), r + Math.cos( 0 * angle ) * (r/3) );
-      // ctx.closePath();
-      // ctx.lineWidth = 2;
-      // ctx.lineJoin = 'round';
-      // ctx.strokeStyle = '#000';
-      // ctx.stroke();
-    });
+    master_circle[r] = new Canvas()
+      .size( 2*r, 2*r )
+      .draw(function( ctx ){
+        // circle fill...
+        ctx.beginPath();
+        ctx.arc( r, r, r, 0, 2 * Math.PI, false);
+        ctx.fillStyle = 'rgba(11,30,77,.25)';
+        ctx.fill();
+        ctx.closePath();
+        // circle stroke...
+        ctx.beginPath();
+        ctx.arc( r, r, r-1, 0, 2 * Math.PI, false);
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = '#000';
+        ctx.stroke();
+        ctx.closePath();
+        // circle inset...
+        ctx.beginPath();
+        // var angle = 2 * Math.PI / 3;
+        // ctx.moveTo( r + Math.sin( 0 * angle ) * (r/3), r + Math.cos( 0 * angle ) * (r/3) );
+        // ctx.lineTo( r + Math.sin( 1 * angle ) * (r/3), r + Math.cos( 1 * angle ) * (r/3) );
+        // ctx.lineTo( r + Math.sin( 2 * angle ) * (r/3), r + Math.cos( 2 * angle ) * (r/3) );
+        // ctx.lineTo( r + Math.sin( 0 * angle ) * (r/3), r + Math.cos( 0 * angle ) * (r/3) );
+        // ctx.closePath();
+        // ctx.lineWidth = 2;
+        // ctx.lineJoin = 'round';
+        // ctx.strokeStyle = '#000';
+        // ctx.stroke();
+      });
   }
   return master_circle[r].elem;
 }
