@@ -4,40 +4,7 @@ var Physics = {
   width: 1024,
   height: 512,
   init: function(){
-    Physics.canvas = document.createElement('canvas');
-    document.body.appendChild( Physics.canvas );
-    Physics.canvas.width = Physics.width;
-    Physics.canvas.height = Physics.height;
-    Physics.canvas.style.position = 'absolute';
-    Physics.canvas.style.top = '1px';
-    Physics.canvas.style.left = '1px';
-    Physics.canvas.style.zIndex = 2;
-    Physics.ctx = Physics.canvas.getContext('2d');
-    // draw a separate background canvas...
-    Physics.bgcanvas = document.createElement('canvas');
-    document.body.appendChild( Physics.bgcanvas );
-    Physics.bgcanvas.width = Physics.width+2;
-    Physics.bgcanvas.height = Physics.height+2;
-    Physics.bgcanvas.style.position = 'absolute';
-    Physics.bgcanvas.style.top = '0px';
-    Physics.bgcanvas.style.left = '0px';
-    Physics.bgcanvas.style.zIndex = 1;
-    var bg = Physics.bgcanvas.getContext('2d');
-    bg.beginPath();
-    // vertical lines
-    for ( var i = 1; i < Physics.width+2; i+=32 ){
-      bg.moveTo( i, 0 );
-      bg.lineTo( i, Physics.height );
-    }
-    // horizontal lines
-    for ( var i = 1; i < Physics.height+2; i+=32 ){
-      bg.moveTo( 0, i );
-      bg.lineTo( Physics.width, i );
-    }
-    bg.lineWidth = .5;
-    bg.strokeStyle = 'rgba(0,0,0,.25)';
-    bg.stroke();
-    bg.closePath();
+
   },
   // all interacting objects
   bodies: [],
@@ -57,6 +24,8 @@ var Physics = {
           }
         }
         obj1.worlds_collide();
+        obj1.step( dt );
+        obj1.draw( Render.fg.ctx );
       }
     }
   },
@@ -182,6 +151,11 @@ var Physic = subclass({
         this.pos.x - this.r, // x pos
         this.pos.y - this.r // y pos
       );
+      Render.map.ctx.beginPath();
+      Render.map.ctx.arc( this.pos.x/16, this.pos.y/16, this.r/16, 0, 2 * Math.PI, false);
+      Render.map.ctx.fillStyle = 'rgba(11,30,77,1)';
+      Render.map.ctx.fill();
+      Render.map.ctx.closePath();
   },
   // world deregistration
   destruct: function(){
@@ -191,37 +165,34 @@ var Physic = subclass({
 
 function master_circle ( r ){
   if ( !master_circle[r] ){
-    master_circle[r] = document.createElement('canvas');
-    master_circle[r].width = r * 2;
-    master_circle[r].height = r * 2;
-    var ctx = master_circle[r].getContext('2d');
-
-    // circle fill...
-    ctx.beginPath();
-    ctx.arc( r, r, r, 0, 2 * Math.PI, false);
-    ctx.fillStyle = 'rgba(11,30,77,.25)';
-    ctx.fill();
-    ctx.closePath();
-    // circle stroke...
-    ctx.beginPath();
-    ctx.arc( r, r, r-1, 0, 2 * Math.PI, false);
-    ctx.lineWidth = 2;
-    ctx.strokeStyle = '#000';
-    ctx.stroke();
-    ctx.closePath();
-    // circle inset...
-    ctx.beginPath();
-    // var angle = 2 * Math.PI / 3;
-    // ctx.moveTo( r + Math.sin( 0 * angle ) * (r/3), r + Math.cos( 0 * angle ) * (r/3) );
-    // ctx.lineTo( r + Math.sin( 1 * angle ) * (r/3), r + Math.cos( 1 * angle ) * (r/3) );
-    // ctx.lineTo( r + Math.sin( 2 * angle ) * (r/3), r + Math.cos( 2 * angle ) * (r/3) );
-    // ctx.lineTo( r + Math.sin( 0 * angle ) * (r/3), r + Math.cos( 0 * angle ) * (r/3) );
-    // ctx.closePath();
-    // ctx.lineWidth = 2;
-    // ctx.lineJoin = 'round';
-    // ctx.strokeStyle = '#000';
-    // ctx.stroke();
+    master_circle[r] = new Canvas().draw(function( ctx ){
+      // circle fill...
+      ctx.beginPath();
+      ctx.arc( r, r, r, 0, 2 * Math.PI, false);
+      ctx.fillStyle = 'rgba(11,30,77,.25)';
+      ctx.fill();
+      ctx.closePath();
+      // circle stroke...
+      ctx.beginPath();
+      ctx.arc( r, r, r-1, 0, 2 * Math.PI, false);
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = '#000';
+      ctx.stroke();
+      ctx.closePath();
+      // circle inset...
+      ctx.beginPath();
+      // var angle = 2 * Math.PI / 3;
+      // ctx.moveTo( r + Math.sin( 0 * angle ) * (r/3), r + Math.cos( 0 * angle ) * (r/3) );
+      // ctx.lineTo( r + Math.sin( 1 * angle ) * (r/3), r + Math.cos( 1 * angle ) * (r/3) );
+      // ctx.lineTo( r + Math.sin( 2 * angle ) * (r/3), r + Math.cos( 2 * angle ) * (r/3) );
+      // ctx.lineTo( r + Math.sin( 0 * angle ) * (r/3), r + Math.cos( 0 * angle ) * (r/3) );
+      // ctx.closePath();
+      // ctx.lineWidth = 2;
+      // ctx.lineJoin = 'round';
+      // ctx.strokeStyle = '#000';
+      // ctx.stroke();
+    });
   }
-  return master_circle[r];
+  return master_circle[r].elem;
 }
 

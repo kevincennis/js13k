@@ -17,11 +17,12 @@ var Game = {
     else Game.paused = true;
   },
   step: function( delta ){
-    Physics.collisions();
+    Render.fg.clear();
+    Render.map.clear();
     // update Physics calculations
     Physics.motion( delta );
     // update element positions
-    Physics.render();
+    // Render.fg.draw( Physics.render );
   },
   loop: function( timestamp ){
     if ( Game.paused ){
