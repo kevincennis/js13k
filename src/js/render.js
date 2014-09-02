@@ -243,7 +243,6 @@ function master_circle ( r, type ){
         ctx.fillStyle = Render.gradient( ctx, type, r ); // 'rgba(0,0,0,.25)';
         ctx.fill();
         ctx.closePath();
-        ctx.globalAlpha = 1;
         // circle inset...
         Render.element[ type ]( ctx, r );
       });
