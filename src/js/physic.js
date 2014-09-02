@@ -1,8 +1,8 @@
 
 // physics manager
 var Physics = {
-  width: 1024,
-  height: 512,
+  width: 1014,
+  height: 1170,
   init: function(){
 
   },
@@ -19,6 +19,22 @@ var Physics = {
             obj2 = Physics.bodies[j];
             // collision detected...
             if ( Physics.overlap( obj1, obj2 ) === true ){
+              // if ( obj1.type == 'air' && obj2.type == 'fire' ){
+              //   obj1.type = 'fire';
+              //   obj2.destruct();
+              // }
+              // if ( obj1.type == 'fire' && obj2.type == 'air' ){
+              //   obj2.type = 'fire';
+              //   obj2.destruct();
+              // }
+              // if ( obj1.type == 'water' && obj2.type == 'fire' ){
+              //   obj1.destruct();
+              //   obj2.destruct();
+              // }
+              // if ( obj1.type == 'fire' && obj2.type == 'water' ){
+              //   obj1.destruct();
+              //   obj2.destruct();
+              // }
               Physics.impulse( obj1, obj2 );
             }
           }
@@ -91,7 +107,8 @@ var Physic = subclass({
   mass: null, // mass ( volume * density ) calculated
 
   // world registration
-  construct: function( x, y, r ){
+  construct: function( type, x, y, r ){
+    this.type = type;
     this.r = r || this.r;
     this.mass = Math.PI * this.r * this.r * this.dens;
     this.inv_mass = 1 / this.mass;
@@ -147,54 +164,34 @@ var Physic = subclass({
   // draw the shape on a canvas context
   draw: function( ctx ){
       ctx.drawImage(
-        master_circle( this.r ), // source
+        master_circle( this.r, this.type ), // source
         this.pos.x - this.r, // x pos
         this.pos.y - this.r // y pos
       );
+      // update the minimap
       Render.map.ctx.beginPath();
-      Render.map.ctx.arc( this.pos.x/16, this.pos.y/16, this.r/16, 0, 2 * Math.PI, false);
-      Render.map.ctx.fillStyle = 'rgba(11,30,77,1)';
+      Render.map.ctx.arc( this.pos.x/8, this.pos.y/8, this.r/8, 0, 2 * Math.PI, false);
+      Render.map.ctx.fillStyle = Render.colors[ this.type ];
       Render.map.ctx.fill();
       Render.map.ctx.closePath();
+      // update the background effects
+      Render.fx.ctx.lineWidth = 2;
+      Render.fx.ctx.strokeStyle = Render.colors[ this.type ];
+      Render.fx.ctx.shadowOffsetX = 0;
+      Render.fx.ctx.shadowOffsetY = 0;
+      Render.fx.ctx.shadowBlur = 8;
+      Render.fx.ctx.shadowColor = Render.colors[ this.type ];
+
+      Render.fx.ctx.beginPath();
+      Render.fx.ctx.arc( this.pos.x, this.pos.y, this.r, 0, twoPI, false);
+      Render.fx.ctx.stroke();
+      Render.fx.ctx.closePath();
+
+      Render.fx.ctx.shadowBlur = 0;
   },
   // world deregistration
   destruct: function(){
     delete Physics.bodies[ this.index ];
   }
 });
-
-function master_circle ( r ){
-  if ( !master_circle[r] ){
-    master_circle[r] = new Canvas()
-      .size( 2*r, 2*r )
-      .draw(function( ctx ){
-        // circle fill...
-        ctx.beginPath();
-        ctx.arc( r, r, r, 0, 2 * Math.PI, false);
-        ctx.fillStyle = 'rgba(11,30,77,.25)';
-        ctx.fill();
-        ctx.closePath();
-        // circle stroke...
-        ctx.beginPath();
-        ctx.arc( r, r, r-1, 0, 2 * Math.PI, false);
-        ctx.lineWidth = 2;
-        ctx.strokeStyle = '#000';
-        ctx.stroke();
-        ctx.closePath();
-        // circle inset...
-        ctx.beginPath();
-        // var angle = 2 * Math.PI / 3;
-        // ctx.moveTo( r + Math.sin( 0 * angle ) * (r/3), r + Math.cos( 0 * angle ) * (r/3) );
-        // ctx.lineTo( r + Math.sin( 1 * angle ) * (r/3), r + Math.cos( 1 * angle ) * (r/3) );
-        // ctx.lineTo( r + Math.sin( 2 * angle ) * (r/3), r + Math.cos( 2 * angle ) * (r/3) );
-        // ctx.lineTo( r + Math.sin( 0 * angle ) * (r/3), r + Math.cos( 0 * angle ) * (r/3) );
-        // ctx.closePath();
-        // ctx.lineWidth = 2;
-        // ctx.lineJoin = 'round';
-        // ctx.strokeStyle = '#000';
-        // ctx.stroke();
-      });
-  }
-  return master_circle[r].elem;
-}
 
