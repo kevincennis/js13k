@@ -19,7 +19,7 @@ var Game = {
   step: function( delta ){
     Render.fg.clear();
     // Render.fg.draw( Render.hexgrid );
-    Render.fx.draw( Render.fxfill );
+    Render.fx.fill();
     Render.map.clear();
     // update Physics calculations
     Physics.motion( delta );

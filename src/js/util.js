@@ -43,3 +43,8 @@ function subclass (){
 function isNum ( val ){
   return typeof val === 'number';
 }
+
+// snap to the nearest 1/2 pixel, for crisp lines
+function snap ( v ){
+  return Math.round( v ) + 0.5;
+};

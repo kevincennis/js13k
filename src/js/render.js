@@ -24,16 +24,23 @@ var Render = {
     // background effects
     Render.fx = new Canvas( document.body )
       .size( Physics.width, Physics.height )
-      .style({
+      .css({
         position: 'absolute',
         top: '10px',
         left: '10px',
-        zIndex: 1
-      });
+        zIndex: 1,
+        border: '1px solid rgba(128,128,255,.25)',
+        paddingBottom: '10px'
+      })
+      .set({
+        fillStyle: 'rgba(8,0,16,.25)'
+      })
+      .path()
+      .rect();
     // foreground
     Render.fg = new Canvas( document.body )
       .size( Physics.width, Physics.height )
-      .style({
+      .css({
         position: 'absolute',
         top: '10px',
         left: '10px',
@@ -44,7 +51,7 @@ var Render = {
     // mini map
     Render.map = new Canvas( document.body )
       .size( Physics.width/8, Physics.height/8 )
-      .style({
+      .css({
         position: 'fixed',
         top: '10px',
         left: ( Physics.width + 22 )+'px',
@@ -70,79 +77,50 @@ var Render = {
     d50 = snap( diameter * .50 ),
     d100 = snap( diameter ),
     // heights...
-    h0 = snap( 0 ),
+    h0 = snap( -1 ),
     h25 = snap( height * .25 ),
     h50 = snap( height * .50 ),
     h75 = snap( height * .75 ),
     h100 = snap( height ),
     r = 1; // vertices
-    // snap to the nearest 1/2 pixel, for crisp lines
-    function snap ( v ){
-      return Math.round( v * 2 ) / 2;
-    };
     return new Canvas()
       .size( Math.floor( diameter ), Math.floor( height ) )
-      .draw(function( ctx ){
-        ctx.lineWidth = 1;
-        ctx.strokeStyle = 'rgba(128,128,255,.25)';
-        ctx.fillStyle = 'rgba(128,128,255,.25)';
-        var count = 3;
-        ctx.beginPath();
-        ctx.moveTo( d0, h0 );
-        ctx.lineTo( d0, h100 );
-        ctx.lineTo( d100, h50 );
-        ctx.lineTo( d0, h0 );
-        ctx.moveTo( d50, h0 );
-        ctx.lineTo( d50, h100 );
-        ctx.moveTo( d100, h0 );
-        ctx.lineTo( d0, h50 );
-        ctx.lineTo( d100, h100 );
-        ctx.stroke();
-        ctx.closePath();
-        ctx.beginPath();
-        ctx.moveTo( d0, h0 );
-        ctx.arc( d0, h0, r, 0, twoPI, false);
-        ctx.moveTo( d0, h50 );
-        ctx.arc( d0, h50, r, 0, twoPI, false);
-        ctx.moveTo( d0, h100 );
-        ctx.arc( d0, h100, r, 0, twoPI, false);
-
-        ctx.moveTo( d50, h25 );
-        ctx.arc( d50, h25, r, 0, twoPI, false);
-        ctx.moveTo( d50, h75 );
-        ctx.arc( d50, h75, r, 0, twoPI, false);
-
-        ctx.moveTo( d100, h0 );
-        ctx.arc( d100, h0, r, 0, twoPI, false);
-        ctx.moveTo( d100, h50 );
-        ctx.arc( d100, h50, r, 0, twoPI, false);
-        ctx.moveTo( d100, h100 );
-        ctx.arc( d100, h100, r, 0, twoPI, false);
-        ctx.fill();
-        ctx.closePath();
+      .set({
+        lineWidth: 1,
+        lineCap: 'square',
+        strokeStyle: 'rgba(128,128,255,.75)',
+        fillStyle: 'rgba(128,128,255,.25)'
       })
-    .elem.toDataURL();
+      .path()
+      .move( d0, h0 )
+      .line( d0, h100 )
+      .line( d100, h50 )
+      .line( d0, h0 )
+      .move( d50, h0 )
+      .line( d50, h100 )
+      .move( d100, h0 )
+      .line( d0, h50 )
+      .line( d100, h100 )
+      .stroke()
+      .path()
+      .move( d0, h0 ).circ( r )
+      .move( d0, h50 ).circ( r )
+      .move( d0, h100 ).circ( r )
+      .move( d50, h25 ).circ( r )
+      .move( d50, h75 ).circ( r )
+      .move( d100, h0 ).circ( r )
+      .move( d100, h50 ).circ( r )
+      .move( d100, h100 ).circ( r )
+      .fill()
+      .url();
   },
   starfield: function( ctx ){
-      ctx.fillStyle = 'rgba(8,0,16,.4)';
-      ctx.fillRect( 0, 0, this.w, this.h );
-      var i, n = 500, x, y, r;
-      ctx.closePath();
-      ctx.beginPath();
-      for ( i = 0; i < n; i++ ){
-        r = Math.ceil( Math.random() * 2 );
-        x = Math.random() * this.w;
-        y = Math.random() * this.h;
-        ctx.moveTo( x, y );
-        ctx.arc( x, y, r, 0, twoPI, false );
+      this.path().set({ fillStyle: '#FFF' });
+      for ( var i=0, n = Math.sqrt( this.w * this.h ); i < n; i++ ){
+        this.move( Math.random() * this.w, Math.random() * this.h )
+          .circ( Math.random() * 2 );
       }
-      ctx.fillStyle = '#FFF';
-      ctx.fill();
-      ctx.closePath();
-  },
-  fxfill: function( ctx ){
-    ctx.fillStyle = 'rgba(8,0,16,.2)';
-    ctx.fillRect( 0, 0, this.w, this.h );
+      this.fill();
   },
   colors: {
     fire:  '#F73',
