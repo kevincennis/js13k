@@ -29,8 +29,8 @@ var Render = {
         top: '10px',
         left: '10px',
         zIndex: 1,
-        border: '1px solid rgba(128,128,255,.25)',
-        paddingBottom: '10px'
+        border: '1px solid rgba(128,128,255,.5)',
+        marginBottom: '10px'
       })
       .set({
         fillStyle: 'rgba(8,0,16,.25)'
@@ -45,7 +45,7 @@ var Render = {
         top: '10px',
         left: '10px',
         zIndex: 3,
-        border: '1px solid rgba(128,128,255,.25)',
+        border: '1px solid rgba(128,128,255,.5)',
         background: 'url('+ Render.hexgrid( 39 ) +') repeat'
       });
     // mini map
@@ -89,7 +89,7 @@ var Render = {
       .set({
         lineWidth: 1,
         lineCap: 'square',
-        strokeStyle: 'rgba(128,128,255,.75)',
+        strokeStyle: 'rgba(128,128,255,.25)',
         fillStyle: 'rgba(128,128,255,.25)'
       })
       .path()
