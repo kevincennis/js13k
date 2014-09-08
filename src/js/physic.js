@@ -24,32 +24,32 @@ var Physics = {
           if ( Physics.bodies[j] != null ){
             obj2 = Physics.bodies[j];
             // collision detected...
-            var overlapping = Physics.overlap( obj1, obj2 );
-            if (  overlapping > 1 ){
 
-              var depth = 38/4;
+            if (  Physics.overlap( obj1, obj2 ) === true ){
+
+              var depth = Math.PI * 1e3;
 
               switch ( obj1.mask | obj2.mask ){
                 case FIRE | WATER:
                 case AIR | EARTH:
-                  obj1.set({ r: obj1.r - depth });
-                  obj2.set({ r: obj2.r - depth });
+                  obj1.area( -depth );
+                  obj2.area( -depth );
                   break;
                 case FIRE | AIR:
-                  obj1.set({ r: obj1.r +( obj1.mask & FIRE ? +depth : -depth ) });
-                  obj2.set({ r: obj2.r +( obj2.mask & FIRE ? +depth : -depth ) });
+                  obj1.area( obj1.mask & FIRE ? +depth : -depth );
+                  obj2.area( obj2.mask & FIRE ? +depth : -depth );
                   break;
                 case EARTH | FIRE:
-                  obj1.set({ r: obj1.r +( obj1.mask & EARTH ? +depth : -depth ) });
-                  obj2.set({ r: obj2.r +( obj2.mask & EARTH ? +depth : -depth ) });
+                  obj1.area( obj1.mask & EARTH ? +depth : -depth );
+                  obj2.area( obj2.mask & EARTH ? +depth : -depth );
                   break;
                 case WATER | EARTH:
-                  obj1.set({ r: obj1.r +( obj1.mask & WATER ? +depth : -depth ) });
-                  obj2.set({ r: obj2.r +( obj2.mask & WATER ? +depth : -depth ) });
+                  obj1.area( obj1.mask & WATER ? +depth : -depth );
+                  obj2.area( obj2.mask & WATER ? +depth : -depth );
                   break;
                 case AIR | WATER:
-                  obj1.set({ r: obj1.r +( obj1.mask & AIR ? +depth : -depth ) });
-                  obj2.set({ r: obj2.r +( obj2.mask & AIR ? +depth : -depth ) });
+                  obj1.area( obj1.mask & AIR ? +depth : -depth );
+                  obj2.area( obj2.mask & AIR ? +depth : -depth );
                   break;
               }
               Physics.impulse( obj1, obj2 );
@@ -70,7 +70,7 @@ var Physics = {
       var r = a.r + b.r,
       x = a.pos.x - b.pos.x,
       y = a.pos.y - b.pos.y;
-      return ( r * r ) / ( x * x + y * y );
+      return ( r * r ) > ( x * x + y * y );
   },
   // http://en.wikipedia.org/wiki/Inelastic_collision#Formula
   impulse: function( a, b ) {
@@ -100,16 +100,11 @@ var Physics = {
     a.vel.add( impulse.clone().mult( a.inv_mass ) );
     b.vel.sub( impulse.clone().mult( b.inv_mass ) );
 
-    // apply (attracting) impulse
-    // a.vel.sub( impulse.clone().mult( a.inv_mass ) );
-    // b.vel.add( impulse.clone().mult( b.inv_mass ) );
-
     // position correction for overlaps
-    //
-    // correction = pos_norm.mult( ( depth / ( a.inv_mass + b.inv_mass ) ) * percent );
+    correction = pos_norm.mult( ( depth / ( a.inv_mass + b.inv_mass ) ) * percent );
 
-    // a.force.add( correction.clone().mult( a.inv_mass ) );
-    // b.force.sub( correction.clone().mult( b.inv_mass ) );
+    a.force.add( correction.clone().mult( a.inv_mass ) );
+    b.force.sub( correction.clone().mult( b.inv_mass ) );
 
   }
 
@@ -119,7 +114,7 @@ props[ FIRE ] = {
   type: 'fire',
   color: '#F73',
   dens: .3, // density
-  rest: 1.1, // restitution
+  rest: .99, // restitution
   fric: .001, // friction
 };
 
@@ -127,7 +122,7 @@ props[ AIR ] = {
   type: 'air',
   color: '#EEF',
   dens: .3, // density
-  rest: .8, // restitution
+  rest: .88, // restitution
   fric: .002, // friction
 };
 
@@ -135,7 +130,7 @@ props[ WATER ] = {
   type: 'water',
   color: '#1AF',
   dens: .5, // density
-  rest: .5, // restitution
+  rest: .77, // restitution
   fric: .003, // friction
 };
 
@@ -143,7 +138,7 @@ props[ EARTH ] = {
   type: 'earth',
   color: '#3F8',
   dens: .6, // density
-  rest: .1, // restitution
+  rest: .66, // restitution
   fric: .004, // friction
 };
 
@@ -179,6 +174,9 @@ var Physic = subclass({
   },
   set: function( opts ){
     extend.call( this, opts );
+    if ( this.r < this.min ){
+      this.destruct();
+    }
     this.mass = Math.PI * this.r * this.r * this.dens;
     this.inv_mass = 1 / this.mass;
   },
@@ -229,6 +227,17 @@ var Physic = subclass({
       this.vel.x = Math.abs( this.vel.x );
       this.force.x = this.r - this.pos.x;
     }
+  },
+  // change the area by an amount +/-
+  area: function( delta ){
+    // current area...
+    var area = Math.PI * this.r * this.r;
+    if ( isNum( delta ) ){
+      area = Math.max( this.min, area + delta );
+      // calculate and set a new radius...
+      this.set({r: Math.sqrt( area / Math.PI ) });
+    }
+    return area;
   },
   // draw the shape on a canvas context
   draw: function( ctx ){
