@@ -1,42 +1,87 @@
 var level = [];
 
 // tutorial
-level[0] = [
-  [512,256,32],
-  [128,256,64],
-];
+level[0] = {
+  balls: [
+    FIRE
+  ],
+  field: [
+    [],
+    [ 0, 0, 0, 0, 0, 0, FIRE ],
+    [],
+    [ 0, 0, 0, 0, 0, 0, AIR ],
+    [],
+    [ 0, 0, 0, 0, 0, 0, WATER ],
+    [],
+    [ 0, 0, 0, 0, 0, 0, EARTH ],
+  ],
+  solve: AIR
+};
 
-level[1] = [
-  0,      // 0000000000000000
-  32766,  // 0111111111111110
-  16386,  // 0100000000000010
-  16386,  // 0100000000000010
-  16386,  // 0100000000000010
-  16386,  // 0100000000000010
-  32766,  // 0111111111111110
-  0,      // 0000000000000000
-];
+level[1] = {
+  balls: [
+    FIRE, FIRE, FIRE
+  ],
+  field: [
+    [],
+    [ 0, 0, 0, 0, 0, 0, FIRE ],
+    [ 0, 0, 0, 0, 0, FIRE, FIRE ],
+    [ 0, 0, 0, 0, 0, FIRE, 0, FIRE ],
+    [ 0, 0, 0, 0, FIRE, 0, 0, FIRE ],
+    [ 0, 0, 0, 0, FIRE, 0, 0, 0, FIRE ],
+    [ 0, 0, 0, FIRE, 0, 0, 0, 0, FIRE ],
+    [ 0, 0, 0, FIRE, FIRE, FIRE, FIRE, FIRE, FIRE, FIRE ],
+  ],
+  solve: AIR
+};
 
-level[2] = [
-  11960,  // 0010111010111000
-  10400,  // 0010100010100000
-  11960,  // 0010111010111000
-  41632,  // 1010001010100000
-  61112,  // 1110111010111000
-  0,      // 0000000000000000
-  0,      // 0000000000000000
-  0,      // 0000000000000000
-];
+level[2] = {
+  balls: [
+    FIRE, FIRE, FIRE
+  ],
+  field: [
+    [],
+    [ 0, 0, 0, 0, 0, 0, AIR ],
+    [ 0, 0, 0, 0, 0, AIR, AIR ],
+    [ 0, 0, 0, 0, 0, AIR, 0, AIR ],
+    [ 0, 0, 0, 0, AIR, 0, 0, AIR ],
+    [ 0, 0, 0, AIR, AIR, AIR, AIR, AIR, AIR, AIR ],
+    [ 0, 0, 0, AIR, 0, 0, 0, 0, AIR ],
+    [ 0, 0, 0, AIR, AIR, AIR, AIR, AIR, AIR, AIR ],
+  ],
+  solve: AIR
+};
 
-// tutorial
-level[3] = [
-  2,      // 0000000000000010
-  6,      // 0000000000000110
-  14,     // 0000000000001110
-  30,     // 0000000000011110
-  0,      // 0000000000000000
-  0,      // 0000000000000000
-  0,      // 0000000000000000
-  0,      // 0000000000000000
-];
+level[3] = {
+  balls: [
+    FIRE, FIRE, FIRE
+  ],
+  field: [
+    [],
+    [ 0, 0, 0, WATER, WATER, WATER, WATER, WATER, WATER, WATER ],
+    [ 0, 0, 0, WATER, 0, 0, 0, 0, WATER ],
+    [ 0, 0, 0, 0, WATER, 0, 0, 0, WATER ],
+    [ 0, 0, 0, 0, WATER, 0, 0, WATER ],
+    [ 0, 0, 0, 0, 0, WATER, 0, WATER ],
+    [ 0, 0, 0, 0, 0, WATER, WATER ],
+    [ 0, 0, 0, 0, 0, 0, WATER ],
+  ],
+  solve: AIR
+};
 
+level[4] = {
+  balls: [
+    FIRE, FIRE, FIRE
+  ],
+  field: [
+    [],
+    [ 0, 0, 0, EARTH, EARTH, EARTH, EARTH, EARTH, EARTH, EARTH ],
+    [ 0, 0, 0, EARTH, 0, 0, 0, 0, EARTH ],
+    [ 0, 0, 0, EARTH, EARTH, EARTH, EARTH, EARTH, EARTH, EARTH ],
+    [ 0, 0, 0, 0, EARTH, 0, 0, EARTH ],
+    [ 0, 0, 0, 0, 0, EARTH, 0, EARTH ],
+    [ 0, 0, 0, 0, 0, EARTH, EARTH ],
+    [ 0, 0, 0, 0, 0, 0, EARTH ],
+  ],
+  solve: AIR
+};

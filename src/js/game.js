@@ -54,53 +54,55 @@ var Game = {
     // };
     Physics.init();
     Render.init();
-    // Game.load( level[3] );
-    var r = 32;
+    Game.load( level[0] );
+
     // while ( Physics.bodies.length < 400 ){
     //  new Physic(r);
     // }
 
-    new Physic( 'air', 507.5, 338.5, 39 );
 
-    new Physic( 'water', 468.5, 271, 39 );
-    new Physic( 'water', 546.5, 271, 39 );
-
-    new Physic( 'water', 429.5, 203.5, 39 );
-    new Physic( 'earth', 507.5, 203.5, 39 );
-    new Physic( 'water', 585.5, 203.5, 39 );
-
-    new Physic( 'air', 390.5, 136, 39 );
-    new Physic( 'water', 468.5, 136, 39 );
-    new Physic( 'water', 546.5, 136, 39 );
-    new Physic( 'air', 624.5, 136, 39 );
 
     // simple dead-on collision
     // Physic.prototype.dens = 10;
-    var obj1 = new Physic( 'fire', 507.5, 428.5, 39 );
-    obj1.vel.set( 0, 3 ); //Math.random()-.5
+    var obj1 = new Physic( FIRE, 507.5, 828.5, 39, true );
+    obj1.vel.set( 0, 1.5 ); //Math.random()-.5
   },
   // render a level...
-  load: function( arr ){
-    // for ( var i = 0; i < arr.length; i++ ){
-    //   Physic.apply( this, arr[i] );
-    // }
-    var elems = ['air','water','earth'];
-    var r = 39, w = 16, h = 8, y, x;
-    // row...
-    for ( y = 0; y < h; y++ ){
-      // column...
-      for ( x = 0; x <= w; x++ ){
-        // bitmask...
-        if ( arr[ y ] & ( 1 << x ) ){
-          new Physic(
-            elems[ Math.round( Math.random() * 2 ) ],
-            .5 + Math.round( ( x * 2 * r + r ) / 78 ) * 78,
-            .5 + Math.round( ( y * 2 * r + r ) / 90 ) * 90,
-            r
-          );
+  load: function( level ){
+    var rows = 11, cols, r = 39, d = 2*r, h = 2*d/root3, x, y, obj;
+    for ( var row = 0; row < rows; row++ ){
+      cols = row % 2 ? 13 : 12;
+      x = row % 2 ? r : d;
+      y = h/2 + (3*h/4) * row;
+      if ( !level.field[ row ] ) break;
+      for ( var col = 0; col < cols; col++ ){
+        if ( obj = level.field[ row ][ col ] ){
+          new Physic( obj, x + d * col, y, r-1, true );
         }
       }
     }
+
+
+    // // render the playing field...
+    // for ( var i = 0; i < level.field.length; i++ ){
+    //   new Physic(
+    //     level.field[i][0],
+    //     level.field[i][1],
+    //     level.field[i][2],
+    //     level.field[i][3],
+    //     true
+    //   );
+    // }
+    // render the batters box
+    for ( var i = 0; i < level.balls.length; i++ ){
+      new Physic(
+        level.balls[i],
+        39 + 39 * 2 * i,
+        Physics.height-39,
+        38
+      );
+    }
+
   }
 };
 
