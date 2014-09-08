@@ -11,16 +11,16 @@ var Render = {
   // layers of canvas...
   init: function(){
     // html fill...
-    document.body.style.background = '#08000F';
+    document.body.style.background = '#000000';
     // starfield background
-    Render.stars = new Canvas( document.body )
-      .size( screen.width, Physics.height+20 )
-      .style({
-        position: 'absolute',
-        top: '0px',
-        left: '0px',
-        zIndex: 2
-      }).draw( Render.starfield );
+    // Render.stars = new Canvas( document.body )
+    //   .size( screen.width, Physics.height+220 )
+    //   .css({
+    //     position: 'absolute',
+    //     top: '0px',
+    //     left: '0px',
+    //     zIndex: 2
+    //   }).draw( Render.starfield );
     // background effects
     Render.fx = new Canvas( document.body )
       .size( Physics.width, Physics.height )
@@ -45,7 +45,7 @@ var Render = {
         top: '10px',
         left: '10px',
         zIndex: 3,
-        border: '1px solid rgba(128,128,255,.5)',
+        border: '1px solid rgba(128,128,255,.25)',
         background: 'url('+ Render.hexgrid( 39 ) +') repeat'
       });
     // mini map
@@ -57,15 +57,16 @@ var Render = {
         left: ( Physics.width + 22 )+'px',
         zIndex: 4,
         border: '1px solid rgba(128,128,255,.5)',
-        background: 'rgba(8,0,16,.75)',
+        background: 'rgba(8,0,16,.5)',
       });
   },
-  gradient: function( ctx, type, r ){
-    var grad = ctx.createRadialGradient(r,r,1,r,r,r);
-    grad.addColorStop(1, Render.colors[ type ] );
-    grad.addColorStop(0.95, 'rgba(0,0,0,1)');
-    grad.addColorStop(0.4, 'rgba(42,42,42,.5)');
-    grad.addColorStop(0, 'rgba(0,0,0,1)');
+  gradient: function( ctx, type, x, y, r ){
+    var grad = ctx.createRadialGradient(x,y,1,x,y,r);
+    // grad.addColorStop(1, Render.colors[ type ] );
+    // grad.addColorStop(1, 'rgba(255,255,255,1)' );
+    grad.addColorStop(1, 'rgba(0,0,0,1)');
+    grad.addColorStop(.5, 'rgba(54,54,54,.5)');
+    // grad.addColorStop(0, 'rgba(0,0,0,1)');
     return grad;
   },
   // isometric grid background image
@@ -127,103 +128,80 @@ var Render = {
     air:   '#EEF',
     water: '#1AF',
     earth: '#3F8'
-  },
-  // elemental icon shapes
-  element: {
-    fire: function( ctx, r ){
-      // stroke style
-      ctx.lineWidth = 1.5;
-      ctx.lineJoin = 'round';
-      ctx.strokeStyle = Render.colors.fire;
-      ctx.shadowOffsetX = 0;
-      ctx.shadowOffsetY = 0;
-      ctx.shadowBlur = 4;
-      ctx.shadowColor = "rgba(0,0,0,.75)";
-      // up triangle
-      ctx.beginPath();
-      ctx.moveTo( r + Math.sin( deg300 ) * (r/4), r + Math.cos( deg300 ) * (r/4) );
-      ctx.lineTo( r + Math.sin( deg60 ) * (r/4), r + Math.cos( deg60 ) * (r/4) );
-      ctx.lineTo( r + Math.sin( deg180 ) * (r/4), r + Math.cos( deg180 ) * (r/4) );
-      ctx.lineTo( r + Math.sin( deg300 ) * (r/4), r + Math.cos( deg300 ) * (r/4) );
-      ctx.closePath();
-      ctx.stroke();
-    },
-    air: function( ctx, r ){
-      // stroke style
-      ctx.lineWidth = 1.5;
-      ctx.lineJoin = 'round';
-      ctx.strokeStyle = Render.colors.air;
-      ctx.shadowOffsetX = 0;
-      ctx.shadowOffsetY = 0;
-      ctx.shadowBlur = 4;
-      ctx.shadowColor = "rgba(0,0,0,.75)";
-      // up triangle with bar
-      ctx.beginPath();
-      ctx.moveTo( r + Math.sin( deg300 ) * (r/4), r + Math.cos( deg300 ) * (r/4) );
-      ctx.lineTo( r + Math.sin( deg60 ) * (r/4), r + Math.cos( deg60 ) * (r/4) );
-      ctx.lineTo( r + Math.sin( deg180 ) * (r/4), r + Math.cos( deg180 ) * (r/4) );
-      ctx.lineTo( r + Math.sin( deg300 ) * (r/4), r + Math.cos( deg300 ) * (r/4) );
-      ctx.moveTo( r + Math.sin( deg300 ) * (r/4), r + Math.cos( deg300 ) * (r/4) - r/5 );
-      ctx.lineTo( r + Math.sin( deg60 ) * (r/4), r + Math.cos( deg60 ) * (r/4) - r/5 );
-      ctx.closePath();
-      ctx.stroke();
-    },
-    water: function( ctx, r ){
-      // stroke style
-      ctx.lineWidth = 1.5;
-      ctx.lineJoin = 'round';
-      ctx.strokeStyle = Render.colors.water;
-      ctx.shadowOffsetX = 0;
-      ctx.shadowOffsetY = 0;
-      ctx.shadowBlur = 4;
-      ctx.shadowColor = "rgba(0,0,0,.75)";
-      // down triangle
-      ctx.beginPath();
-      ctx.moveTo( r + Math.sin( deg360 ) * (r/4), r + Math.cos( deg360 ) * (r/4) );
-      ctx.lineTo( r + Math.sin( deg120 ) * (r/4), r + Math.cos( deg120 ) * (r/4) );
-      ctx.lineTo( r + Math.sin( deg240 ) * (r/4), r + Math.cos( deg240 ) * (r/4) );
-      ctx.lineTo( r + Math.sin( deg360 ) * (r/4), r + Math.cos( deg360 ) * (r/4) );
-      ctx.closePath();
-      ctx.stroke();
-    },
-    earth: function( ctx, r ){
-      // stroke style
-      ctx.lineWidth = 1.5;
-      ctx.lineJoin = 'round';
-      ctx.strokeStyle = Render.colors.earth;
-      ctx.shadowOffsetX = 0;
-      ctx.shadowOffsetY = 0;
-      ctx.shadowBlur = 4;
-      ctx.shadowColor = "rgba(0,0,0,.75)";
-      // down triangle with bar
-      ctx.beginPath();
-      ctx.moveTo( r + Math.sin( deg360 ) * (r/4), r + Math.cos( deg360 ) * (r/4) );
-      ctx.lineTo( r + Math.sin( deg120 ) * (r/4), r + Math.cos( deg120 ) * (r/4) );
-      ctx.lineTo( r + Math.sin( deg240 ) * (r/4), r + Math.cos( deg240 ) * (r/4) );
-      ctx.lineTo( r + Math.sin( deg360 ) * (r/4), r + Math.cos( deg360 ) * (r/4) );
-      ctx.moveTo( r + Math.sin( deg240 ) * (r/4), r + Math.cos( deg240 ) * (r/4) + r/5 );
-      ctx.lineTo( r + Math.sin( deg120 ) * (r/4), r + Math.cos( deg120 ) * (r/4) + r/5 );
-      ctx.closePath();
-      ctx.stroke();
-    }
   }
 };
 
-
-function master_circle ( r, type ){
+function master_circle ( obj ){
+  var r = obj.r, type = obj.type,
+    x = r + 8, y = r + 8, m = 8;//r/3;
   if ( !master_circle[ r + type ] ){
     master_circle[ r + type ] = new Canvas()
-      .size( 2*r, 2*r )
+      .size( 2 * x, 2 * y )
       .draw(function( ctx ){
         // circle fill...
         ctx.beginPath();
-        ctx.arc( r, r, r, 0, twoPI, false);
-        ctx.fillStyle = Render.gradient( ctx, type, r ); // 'rgba(0,0,0,.25)';
+        ctx.arc( x, y, r, 0, twoPI, false);
+        ctx.fillStyle = Render.gradient( ctx, type, x, y, r ); // 'rgba(0,0,0,.25)';
         ctx.fill();
         ctx.closePath();
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = obj.color;
+        ctx.stroke();
         // circle inset...
-        Render.element[ type ]( ctx, r );
+        ctx.lineJoin = 'round';
+        ctx.beginPath();
+        // upward triangle
+        if ( obj.mask & ( FIRE | AIR ) ){
+          ctx.moveTo( x, y - m );
+          ctx.lineTo( x - m * root3/2, y + m/2 );
+          ctx.lineTo( x + m * root3/2, y + m/2 );
+          ctx.lineTo( x, y - m );
+          ctx.closePath();
+        }
+        // downward triangle
+        if ( obj.mask & ( WATER | EARTH ) ){
+          ctx.moveTo( x, y + m );
+          ctx.lineTo( x - m * root3/2, y - m/2 );
+          ctx.lineTo( x + m * root3/2, y - m/2 );
+          ctx.lineTo( x, y + m );
+          ctx.closePath();
+        }
+        // horizontal bar
+        if ( obj.mask & ( EARTH | AIR ) ){
+          ctx.moveTo( x - m * root3/2, y );
+          ctx.lineTo( x + m * root3/2, y );
+          ctx.closePath();
+        }
+        // dark outline
+        ctx.lineWidth = 5;
+        ctx.strokeStyle = '#000';
+        ctx.stroke();
+        // color line
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = obj.color;
+        ctx.stroke();
       });
   }
   return master_circle[ r + type ].elem;
+}
+
+function slave_circle ( obj, i ){
+  var r = obj.r, type = obj.type,
+  x = r + 12, y = r + 12;
+  if ( !slave_circle[ r + type ] ){
+    slave_circle[ r + type ] = new Canvas()
+      .size( 2 * x, 2 * y )
+      .set({
+        lineWidth: 2,
+        strokeStyle: obj.color,
+        shadowOffsetX: 0,
+        shadowOffsetY: 0,
+        shadowBlur: 12,
+        shadowColor: obj.color
+      })
+      .path()
+      .circ( r, x, y )
+      .stroke();
+  }
+  return slave_circle[ r + type ].elem;
 }

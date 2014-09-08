@@ -1,3 +1,9 @@
+var props = {},
+// bitmasks for element types...
+FIRE = 1,
+AIR = 2,
+WATER = 4,
+EARTH = 8;
 
 // physics manager
 var Physics = {
@@ -93,11 +99,46 @@ var Physics = {
 
 };
 
+props[ FIRE ] = {
+  type: 'fire',
+  color: '#F73',
+  dens: .3, // density
+  rest: 1.1, // restitution
+  fric: .001, // friction
+};
+
+props[ AIR ] = {
+  type: 'air',
+  color: '#EEF',
+  dens: .3, // density
+  rest: .8, // restitution
+  fric: .002, // friction
+};
+
+props[ WATER ] = {
+  type: 'water',
+  color: '#1AF',
+  dens: .5, // density
+  rest: .5, // restitution
+  fric: .003, // friction
+};
+
+props[ EARTH ] = {
+  type: 'earth',
+  color: '#3F8',
+  dens: .6, // density
+  rest: .1, // restitution
+  fric: .004, // friction
+};
+
 // a base class for physics bodies
 var Physic = subclass({
-
+  // identify the element...
+  mask: 0,
+  type: null,
   // physical properties
   r: 32, // radius
+  min: 16, // minimum radius
   pos: { x:0, y:0 }, // position - coordinate vector
   vel: { x:0, y:0 }, // velocity - change in position
   force: { x:0, y:0 }, // additional applied forces
@@ -163,31 +204,27 @@ var Physic = subclass({
   },
   // draw the shape on a canvas context
   draw: function( ctx ){
+      if ( this.r < this.min ){
+        return;
+      }
       ctx.drawImage(
-        master_circle( this.r, this.type ), // source
-        this.pos.x - this.r, // x pos
-        this.pos.y - this.r // y pos
+        master_circle( this ), // source
+        this.pos.x - this.r - 8, // x pos
+        this.pos.y - this.r - 8 // y pos
       );
       // update the minimap
       Render.map.ctx.beginPath();
       Render.map.ctx.arc( this.pos.x/8, this.pos.y/8, this.r/8, 0, 2 * Math.PI, false);
-      Render.map.ctx.fillStyle = Render.colors[ this.type ];
+      Render.map.ctx.fillStyle = this.color;
       Render.map.ctx.fill();
       Render.map.ctx.closePath();
+
       // update the background effects
-      Render.fx.ctx.lineWidth = 2;
-      Render.fx.ctx.strokeStyle = Render.colors[ this.type ];
-      Render.fx.ctx.shadowOffsetX = 0;
-      Render.fx.ctx.shadowOffsetY = 0;
-      Render.fx.ctx.shadowBlur = 8;
-      Render.fx.ctx.shadowColor = Render.colors[ this.type ];
-
-      Render.fx.ctx.beginPath();
-      Render.fx.ctx.arc( this.pos.x, this.pos.y, this.r, 0, twoPI, false);
-      Render.fx.ctx.stroke();
-      Render.fx.ctx.closePath();
-
-      Render.fx.ctx.shadowBlur = 0;
+      Render.fx.ctx.drawImage(
+        slave_circle( this ), // source
+        this.pos.x - this.r - 12, // x pos
+        this.pos.y - this.r - 12 // y pos
+      );
   },
   // world deregistration
   destruct: function(){
