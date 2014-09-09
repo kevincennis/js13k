@@ -18,13 +18,10 @@ var Game = {
   },
   step: function( delta ){
     Render.fg.clear();
-    // Render.fg.draw( Render.hexgrid );
     Render.fx.fill();
     Render.map.clear();
     // update Physics calculations
     Physics.motion( delta );
-    // update element positions
-    // Render.fg.draw( Physics.render );
   },
   loop: function( timestamp ){
     if ( Game.paused ){
@@ -43,32 +40,20 @@ var Game = {
     window.onblur = function(){
       Game.paused = true;
     };
-    // window.onscroll = function(){
-    //   var total_dist = Physics.height + 10 - Render.stars.h;
-    //   var percent = Math.min( window.pageYOffset / ( Physics.height+10-screen.height), 1 );
-    //   var dist = percent * total_dist;
-    //   console.log( total_dist, percent, dist );
-    //   Render.stars.style({
-    //     top:  dist + 'px'
-    //   });
-    // };
+
     Physics.init();
     Render.init();
+
     Game.load( level[0] );
 
-    // while ( Physics.bodies.length < 400 ){
-    //  new Physic(r);
-    // }
-
-
-
     // simple dead-on collision
-    // Physic.prototype.dens = 10;
     var obj1 = new Physic( FIRE, 507.5, 828.5, 39, true );
     obj1.vel.set( 0, 1.5 ); //Math.random()-.5
   },
   // render a level...
   load: function( level ){
+
+    // render the playing field along hexgrid...
     var rows = 11, cols, r = 39, d = 2*r, h = 2*d/root3, x, y, obj;
     for ( var row = 0; row < rows; row++ ){
       cols = row % 2 ? 13 : 12;
@@ -82,17 +67,6 @@ var Game = {
       }
     }
 
-
-    // // render the playing field...
-    // for ( var i = 0; i < level.field.length; i++ ){
-    //   new Physic(
-    //     level.field[i][0],
-    //     level.field[i][1],
-    //     level.field[i][2],
-    //     level.field[i][3],
-    //     true
-    //   );
-    // }
     // render the batters box
     for ( var i = 0; i < level.balls.length; i++ ){
       new Physic(
