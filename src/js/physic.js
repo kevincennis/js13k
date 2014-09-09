@@ -24,34 +24,7 @@ var Physics = {
           if ( Physics.bodies[j] != null ){
             obj2 = Physics.bodies[j];
             // collision detected...
-
-            if (  Physics.overlap( obj1, obj2 ) === true ){
-
-              var depth = Math.PI * 1e3;
-
-              switch ( obj1.mask | obj2.mask ){
-                case FIRE | WATER:
-                case AIR | EARTH:
-                  obj1.area( -depth );
-                  obj2.area( -depth );
-                  break;
-                case FIRE | AIR:
-                  obj1.area( obj1.mask & FIRE ? +depth : -depth );
-                  obj2.area( obj2.mask & FIRE ? +depth : -depth );
-                  break;
-                case EARTH | FIRE:
-                  obj1.area( obj1.mask & EARTH ? +depth : -depth );
-                  obj2.area( obj2.mask & EARTH ? +depth : -depth );
-                  break;
-                case WATER | EARTH:
-                  obj1.area( obj1.mask & WATER ? +depth : -depth );
-                  obj2.area( obj2.mask & WATER ? +depth : -depth );
-                  break;
-                case AIR | WATER:
-                  obj1.area( obj1.mask & AIR ? +depth : -depth );
-                  obj2.area( obj2.mask & AIR ? +depth : -depth );
-                  break;
-              }
+            if ( Physics.overlap( obj1, obj2 ) ){
               Physics.impulse( obj1, obj2 );
             }
           }
@@ -72,37 +45,64 @@ var Physics = {
       y = a.pos.y - b.pos.y;
       return ( r * r ) > ( x * x + y * y );
   },
-  // http://en.wikipedia.org/wiki/Inelastic_collision#Formula
+  // apply forces and interactions
   impulse: function( a, b ) {
-
     // vector direction between centers
     var pos_norm = a.pos.clone().sub( b.pos ).norm(),
     // Calculate relative velocity in terms of the normal direction
     velAlongNormal = pos_norm.dot( a.vel.clone().sub( b.vel ) ),
-    // Calculate restitution
-    e = ( a.rest + b.rest ) / 2, // avg
-    // Calculate impulse scalar
-    j = -( 1 + e ) * velAlongNormal / ( a.inv_mass + b.inv_mass );
-    // add to acceleration, as change in velocity
-    impulse = pos_norm.clone().mult( j ),
-    // how much overlap...
-    penetration = a.r + b.r - a.pos.clone().sub( b.pos ).length(),
-    percent = 0.5, // usually 20% to 80%
-    slop = 1, // usually 0.01 to 0.1
-    depth = Math.max( penetration - slop, slop )*2;
-
+    // approximate the force of collision for matter transfer
+    depth = Math.sqrt( velAlongNormal * velAlongNormal * a.mass * b.mass );
+    depth = Math.max(
+      Math.min( Math.PI * depth, a.area(), b.area() ), 1234
+    );
+    // matter interaction
+    switch ( a.mask | b.mask ){
+      case FIRE | WATER:
+      case AIR | EARTH:
+        a.area( -depth );
+        b.area( -depth );
+        break;
+      case FIRE | AIR:
+        a.area( a.mask & FIRE ? +depth : -depth );
+        b.area( b.mask & FIRE ? +depth : -depth );
+        break;
+      case EARTH | FIRE:
+        a.area( a.mask & EARTH ? +depth : -depth );
+        b.area( b.mask & EARTH ? +depth : -depth );
+        break;
+      case WATER | EARTH:
+        a.area( a.mask & WATER ? +depth : -depth );
+        b.area( b.mask & WATER ? +depth : -depth );
+        break;
+      case AIR | WATER:
+        a.area( a.mask & AIR ? +depth : -depth );
+        b.area( b.mask & AIR ? +depth : -depth );
+        break;
+    }
     // Do not resolve if velocities are separating
     if ( velAlongNormal > 0 ){
       return;
     }
 
+    // Calculate restitution
+    var e = ( a.rest + b.rest ) / 2, // avg
+    // Calculate impulse scalar
+    j = -( 1 + e ) * velAlongNormal / ( a.inv_mass + b.inv_mass );
+    // add to acceleration, as change in velocity
+    impulse = pos_norm.clone().mult( j );
     // apply (repelling) impulse
     a.vel.add( impulse.clone().mult( a.inv_mass ) );
     b.vel.sub( impulse.clone().mult( b.inv_mass ) );
 
-    // position correction for overlaps
-    correction = pos_norm.mult( ( depth / ( a.inv_mass + b.inv_mass ) ) * percent );
-
+    // how much overlap...
+    var penetration = a.r + b.r - a.pos.clone().sub( b.pos ).length(),
+    percent = 0.5, // usually 20% to 80%
+    slop = 1, // usually 0.01 to 0.1
+    correction = Math.max( penetration - slop, slop );
+    correction /= a.inv_mass + b.inv_mass;
+    correction = pos_norm.mult( correction * percent );
+    // positional correction for overlaps
     a.force.add( correction.clone().mult( a.inv_mass ) );
     b.force.sub( correction.clone().mult( b.inv_mass ) );
 
@@ -113,33 +113,33 @@ var Physics = {
 props[ FIRE ] = {
   type: 'fire',
   color: '#F73',
-  dens: .3, // density
-  rest: .99, // restitution
-  fric: .001, // friction
+  // dens: .3, // density
+  // rest: .99, // restitution
+  // fric: .001, // friction
 };
 
 props[ AIR ] = {
   type: 'air',
   color: '#EEF',
-  dens: .3, // density
-  rest: .88, // restitution
-  fric: .002, // friction
+  // dens: .3, // density
+  // rest: .88, // restitution
+  // fric: .002, // friction
 };
 
 props[ WATER ] = {
   type: 'water',
   color: '#1AF',
-  dens: .5, // density
-  rest: .77, // restitution
-  fric: .003, // friction
+  // dens: .5, // density
+  // rest: .77, // restitution
+  // fric: .003, // friction
 };
 
 props[ EARTH ] = {
   type: 'earth',
   color: '#3F8',
-  dens: .6, // density
-  rest: .66, // restitution
-  fric: .004, // friction
+  // dens: .6, // density
+  // rest: .66, // restitution
+  // fric: .004, // friction
 };
 
 // a base class for physics bodies
@@ -148,14 +148,14 @@ var Physic = subclass({
   mask: 0,
   type: null,
   // physical properties
-  r: 32, // radius
+  r: 38, // radius
   min: 16, // minimum radius
   pos: { x:0, y:0 }, // position - coordinate vector
   vel: { x:0, y:0 }, // velocity - change in position
   force: { x:0, y:0 }, // additional applied forces
-  dens: .5, // density
-  rest: .75, // restitution
-  fric: .005, // friction
+  dens: .6, // density
+  rest: .9, // restitution
+  fric: .002, // friction
   mass: null, // mass ( volume * density ) calculated
 
   // world registration
@@ -174,11 +174,10 @@ var Physic = subclass({
   },
   set: function( opts ){
     extend.call( this, opts );
-    if ( this.r < this.min ){
-      this.destruct();
+    if ( this.r > this.min ){
+      this.mass = this.area() * this.dens;
+      this.inv_mass = 1 / this.mass;
     }
-    this.mass = Math.PI * this.r * this.r * this.dens;
-    this.inv_mass = 1 / this.mass;
   },
   // no-op, override in subclasses
   init: function(){ },
@@ -192,7 +191,7 @@ var Physic = subclass({
     // the object is moving...
     if ( this.vel.dot() > 0 ){
       // apply a change in velocity due to friction
-      // this.vel.mult( 1-this.fric ).min( 1e-3 );
+      this.vel.mult( 1-this.fric ).min( 1e-3 );
       // calculate the change in position
       this.pos.add( this.vel.clone().mult( dt ) );
     }
