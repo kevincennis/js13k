@@ -44,6 +44,11 @@ var Game = {
     Physics.init();
     Render.init();
 
+    Game.dragStartMouse = new Vect( 0, 0 );
+    Game.dragStartPos = new Vect( 0, 0 );
+    Game.dragLastPos = new Vect( 0, 0 );
+    Game.bindEvents();
+
     Game.load( level[0] );
 
     // simple dead-on collision
@@ -77,10 +82,70 @@ var Game = {
       );
     }
 
+  },
+
+  bindEvents: function() {
+    // drag start
+    Render.fg.elem.addEventListener('mousedown', function( e ) {
+      var i = 0, len = Physics.bodies.length, body, a, b, c;
+      if ( e.pageY > Physics.height - 200 ) {
+        for ( ; i < len; ++i ) {
+          body = Physics.bodies[ i ];
+          if ( body && !body.active ) {
+            a = ( e.pageX - 10 ) - body.pos.x;
+            b = ( e.pageY - 10 ) - body.pos.y;
+            c = a * a + b * b;
+            if ( c <= body.r * body.r ) {
+              body.launching = false;
+              Game.dragging = body;
+              Game.dragLastTime = Date.now();
+              Game.dragCurrTime = Date.now();
+              Game.dragStartMouse.set( e.pageX - 10, e.pageY - 10 );
+              Game.dragStartPos.set( body.pos.x, body.pos.y );
+              Game.dragLastPos.set( body.pos.x, body.pos.y );
+              return;
+            }
+          }
+        }
+      }
+      Game.dragging = false;
+    }, false);
+    // drag
+    window.addEventListener('mousemove', function( e ) {
+      var body, dt, dx, dy;
+      if ( body = Game.dragging ) {
+        dt = Date.now() - Game.dragTime;
+        dx = ( e.pageX - 10 ) - Game.dragStartMouse.x;
+        dy = ( e.pageY - 10 ) - Game.dragStartMouse.y;
+        Game.dragLastTime = Game.dragCurrTime;
+        Game.dragCurrTime = Date.now();
+        Game.dragLastPos.set( body.pos.x, body.pos.y );
+        body.pos.set(
+          Math.max( body.r, Math.min( Physics.width - body.r, Game.dragStartPos.x + dx ) ),
+          Math.min( Physics.height - body.r, Game.dragStartPos.y + dy )
+        );
+      }
+    }, false);
+    // dragend
+    window.addEventListener('mouseup', function( e ) {
+      var now = Date.now(), body = Game.dragging, dt, dx, dy;
+      if ( !Game.dragging ) {
+        return;
+      }
+      Game.dragging = null;
+      body.launching = true;
+      if ( now - Game.dragCurrTime > 50 ) {
+        return;
+      }
+      dt = ( Game.dragCurrTime - Game.dragLastTime );
+      dx = body.pos.x - Game.dragLastPos.x;
+      dy = body.pos.y - Game.dragLastPos.y;
+      body.vel.set( ( dx / dt ) || 0, ( dy / dt ) || 0 );
+    }, false);
   }
+
 };
 
 // animation
 var reqAnimFrame = window.requestAnimationFrame || window.mozRequestAnimationFrame ||
   window.webkitRequestAnimationFrame || window.oRequestAnimationFrame;
-

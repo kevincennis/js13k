@@ -171,6 +171,8 @@ var Physic = subclass({
     this.init.apply( this, arguments );
     this.index = Physics.bodies.push( this ) - 1;
     this.active = active || false;
+    // is the body in the process of being flicked into play?
+    this.launching = false;
   },
   set: function( opts ){
     extend.call( this, opts );
@@ -195,6 +197,11 @@ var Physic = subclass({
       // calculate the change in position
       this.pos.add( this.vel.clone().mult( dt ) );
     }
+    // make a "launching" body active once it enters the "real" world
+    if ( this.launching && this.pos.y < Physics.height - 200 - this.r ) {
+      this.active = true;
+      this.launching = false;
+    }
     this.pos.add( this.force );
     // console.log( this.vel );
     this.force.x = 0;
@@ -203,7 +210,7 @@ var Physic = subclass({
 
   // collide with the world boundaries
   worlds_collide: function(){
-    if ( !this.active ){
+    if ( !this.active && !this.launching ){
       return;
     }
     // north
@@ -211,8 +218,8 @@ var Physic = subclass({
       this.vel.y = Math.abs( this.vel.y );
       this.force.y = this.r - this.pos.y;
     }
-    // south
-    if ( this.pos.y > Physics.height - 200 - this.r ){
+    // south (doesn't apply to launching bodies)
+    if ( !this.launching && this.pos.y > Physics.height - 200 - this.r ){
       this.vel.y = -Math.abs( this.vel.y );
       this.force.y = Physics.height - 200 - this.r - this.pos.y;
     }
