@@ -127,26 +127,32 @@ var Game = {
           Math.max( body.r, Math.min( Physics.width - body.r, Game.dragStartPos.x + dx ) ),
           Math.min( Physics.height - body.r, Game.dragStartPos.y + dy )
         );
+        if ( body.pos.y < Physics.height - 200 ){
+          Game.release();
+        }
       }
     }, false);
     // dragend
-    window.addEventListener('mouseup', function( e ) {
-      var now = Date.now(), body = Game.dragging, dt, dx, dy;
-      if ( !Game.dragging ) {
-        return;
-      }
-      Game.dragging = null;
-      body.launching = true;
-      if ( now - Game.dragCurrTime > 50 ) {
-        return;
-      }
-      dt = ( Game.dragCurrTime - Game.dragLastTime );
-      dx = body.pos.x - Game.dragLastPos.x;
-      dy = body.pos.y - Game.dragLastPos.y;
-      body.vel.set( ( dx / dt ) || 0, ( dy / dt ) || 0 );
-    }, false);
-  }
+    window.addEventListener('mouseup', Game.release, false);
+  },
 
+  release: function(){
+    var now = Date.now(), body = Game.dragging, dt, dx, dy;
+    if ( !Game.dragging ) {
+      return;
+    }
+    Game.dragging = null;
+    body.launching = true;
+    if ( now - Game.dragCurrTime > 50 ) {
+      return;
+    }
+    dt = ( Game.dragCurrTime - Game.dragLastTime );
+    dx = body.pos.x - Game.dragLastPos.x;
+    dy = body.pos.y - Game.dragLastPos.y;
+    body.vel.set( ( dx / dt ) || 0, ( dy / dt ) || 0 );
+    body.vel.x = body.vel.x > 0 ? Math.min( body.vel.x, 3 ) : Math.max( body.vel.x, -3 );
+    body.vel.y = body.vel.y > 0 ? Math.min( body.vel.y, 3 ) : Math.max( body.vel.y, -3 );
+  }
 };
 
 // animation
