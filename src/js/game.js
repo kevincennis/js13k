@@ -102,6 +102,7 @@ var Game = {
               Game.dragStartMouse.set( e.pageX - 10, e.pageY - 10 );
               Game.dragStartPos.set( body.pos.x, body.pos.y );
               Game.dragLastPos.set( body.pos.x, body.pos.y );
+              body.vel.x = body.vel.y = 0;
               return;
             }
           }
