@@ -219,9 +219,10 @@ var Physic = subclass({
       this.force.y = this.r - this.pos.y;
     }
     // south (doesn't apply to launching bodies)
-    if ( !this.launching && this.pos.y > Physics.height - 200 - this.r ){
+    var south = this.launching ? Physics.height : Physics.height - 200;
+    if ( this.pos.y > south - this.r ){
       this.vel.y = -Math.abs( this.vel.y );
-      this.force.y = Physics.height - 200 - this.r - this.pos.y;
+      this.force.y = south - this.r - this.pos.y;
     }
     // east
     if ( this.pos.x > Physics.width - this.r ){
