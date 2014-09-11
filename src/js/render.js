@@ -46,7 +46,7 @@ var Render = {
         left: '10px',
         zIndex: 3,
         border: '1px solid rgba(128,128,255,.5)',
-        background: 'url('+ Render.hexgrid( 39 ) +') repeat'
+        background: 'url('+ Render.hexgrid( Physics.width/26 ) +') repeat'
       });
     // mini map
     Render.map = new Canvas( document.body )

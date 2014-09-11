@@ -55,7 +55,7 @@ var Game = {
   load: function( level ){
 
     // render the playing field along hexgrid...
-    var rows = 11, cols, r = 39, d = 2*r, h = 2*d/root3, x, y, obj;
+    var rows = 11, cols, r = Physics.width/26, d = 2*r, h = 2*d/root3, x, y, obj;
     for ( var row = 0; row < rows; row++ ){
       cols = row % 2 ? 13 : 12;
       x = row % 2 ? r : d;
@@ -72,9 +72,9 @@ var Game = {
     for ( var i = 0; i < level.balls.length; i++ ){
       new Physic(
         level.balls[i],
-        39 + 39 * 2 * i,
-        Physics.height-39,
-        38
+        r + r * 2 * i,
+        Physics.height-r,
+        r-1
       );
     }
 
