@@ -87,6 +87,9 @@ var Game = {
   bindEvents: function() {
     // drag start
     Render.fg.elem.addEventListener('mousedown', function( e ) {
+      if ( Game.paused ){
+        Game.pause();
+      }
       var i = 0, len = Physics.bodies.length, body, a, b, c;
       if ( e.pageY > Physics.height - 200 ) {
         for ( ; i < len; ++i ) {
