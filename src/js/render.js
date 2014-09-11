@@ -23,7 +23,7 @@ var Render = {
     //   }).draw( Render.starfield );
     // background effects
     Render.fx = new Canvas( document.body )
-      .size( Physics.width, Physics.height )
+      .size( Physics.width, Physics.height-200 )
       .css({
         position: 'absolute',
         top: '10px',
