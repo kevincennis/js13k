@@ -7,8 +7,8 @@ EARTH = 8;
 
 // physics manager
 var Physics = {
-  width: 1014,
-  height: 1170,
+  width: 780,
+  height: 860,
   init: function(){
 
   },
