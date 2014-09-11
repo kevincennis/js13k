@@ -50,10 +50,6 @@ var Game = {
     Game.bindEvents();
 
     Game.load( level[0] );
-
-    // simple dead-on collision
-    var obj1 = new Physic( FIRE, 507.5, 828.5, 39, true );
-    obj1.vel.set( 0, 1.5 ); //Math.random()-.5
   },
   // render a level...
   load: function( level ){
