@@ -155,7 +155,7 @@ var Physic = subclass({
   force: { x:0, y:0 }, // additional applied forces
   dens: .6, // density
   rest: .9, // restitution
-  fric: .002, // friction
+  fric: 0, // friction
   mass: null, // mass ( volume * density ) calculated
 
   // world registration
@@ -193,7 +193,7 @@ var Physic = subclass({
     // the object is moving...
     if ( this.vel.dot() > 0 ){
       // apply a change in velocity due to friction
-      this.vel.mult( 1-this.fric ).min( 1e-3 );
+      // this.vel.mult( 1-this.fric ).min( 1e-3 );
       // calculate the change in position
       this.pos.add( this.vel.clone().mult( dt ) );
     }
