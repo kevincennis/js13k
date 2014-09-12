@@ -9,13 +9,19 @@ EARTH = 8;
 var Physics = {
   width: 780,
   height: 860,
-  init: function(){
-
+  reset: function(){
+    Physics.bodies = [];
   },
   // all interacting objects
   bodies: [],
+  // the sum total of each element
+  matter: {},
   // time step all bodies in motion, detect and resolve collisions
   motion: function( dt ){
+    Physics.matter[ FIRE ] = 0;
+    Physics.matter[ AIR ] = 0;
+    Physics.matter[ WATER ] = 0;
+    Physics.matter[ EARTH ] = 0;
     var i, j, len = Physics.bodies.length, obj1, obj2;
     for ( i = 0; i < len; i++ ){
       if ( Physics.bodies[i] != null ){
@@ -32,8 +38,10 @@ var Physics = {
         obj1.worlds_collide();
         obj1.step( dt );
         obj1.draw( Render.fg.ctx );
+        Physics.matter[ obj1.mask ] += obj1.area();
       }
     }
+    Game.solution( Physics.matter );
   },
   // do two circles overlap?
   overlap: function( a, b ){
@@ -53,8 +61,8 @@ var Physics = {
     velAlongNormal = pos_norm.dot( a.vel.clone().sub( b.vel ) ),
     // approximate the force of collision for matter transfer
     depth = Math.sqrt( velAlongNormal * velAlongNormal * a.mass * b.mass );
-    depth = Math.max(
-      Math.min( Math.PI * depth, a.area(), b.area() ), 1234
+    depth = Math.min(
+      Math.max( Math.PI * depth, 1234 ), a.area(), b.area()
     );
     // matter interaction
     switch ( a.mask | b.mask ){

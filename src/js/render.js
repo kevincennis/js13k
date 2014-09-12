@@ -33,7 +33,7 @@ var Render = {
         marginBottom: '10px'
       })
       .set({
-        fillStyle: 'rgba(8,0,16,.25)'
+        fillStyle: 'rgba(0,0,0,.25)'
       })
       .path()
       .rect();
@@ -59,6 +59,39 @@ var Render = {
         border: '1px solid rgba(128,128,255,.5)',
         background: 'rgba(8,0,16,.5)',
       });
+    // solution tracker
+    Render.goal = new Canvas( document.body )
+      .size( Physics.width/8, Physics.height * 7/8 -10 )
+      .css({
+        position: 'fixed',
+        top: Math.round( Physics.height/8 + 20 )+'px',
+        left: ( Physics.width + 22 )+'px',
+        zIndex: 4,
+        border: '1px solid rgba(128,128,255,.5)',
+        background: 'rgba(8,0,16,.5)',
+      });
+  },
+  message: function( msg, desc ){
+    Render.fg.draw(function( ctx ){
+      // dimesnions...
+      var x = Physics.width/2, y = ( Physics.height - 200 )/2,
+      w = Physics.width, h = Physics.height - 200;
+      // background knockout...
+      ctx.fillStyle = 'rgba(8,0,16,.5)';
+      ctx.fillRect( x - w/2, y-h/2, w, h );
+      // headline...
+      ctx.font = '48px monospace';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillStyle = 'rgba(128,128,255,.75)';
+      ctx.fillText( msg, x, y );
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = 'rgba(128,128,255,1)';
+      ctx.strokeText( msg, x, y );
+      // description...
+      ctx.font = '18px monospace';
+      ctx.fillText( desc, x, y + 36 );
+    });
   },
   gradient: function( ctx, type, x, y, r ){
     var grad = ctx.createRadialGradient(x,y,1,x,y,r);

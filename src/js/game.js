@@ -1,20 +1,25 @@
 // control everything
 var Game = {
   start: function(){
-    Game.setup();
-    // the intial timestamp
-    Game.started = 0;
-    // begin time stepping...
-    Game.pause();
+    Music.init();
+    Render.init();
+    Game.bindEvents();
+    // begin the next level
+    Game.load();
   },
+  lvl: 0,
+  level: null,
   paused: true,
   pause: function(){
     if ( Game.paused ){
       Game.paused = false;
       Game.ticked = 0;
       reqAnimFrame( Game.loop );
+      Music.play();
     }
-    else Game.paused = true;
+    else {
+      Game.paused = true;
+    }
   },
   step: function( delta ){
     Render.fg.clear();
@@ -24,7 +29,13 @@ var Game = {
     Physics.motion( delta );
   },
   loop: function( timestamp ){
+    if ( Game.level.solved ){
+      Render.message('COMPLETE','click to continue');
+      return;
+    }
     if ( Game.paused ){
+      Render.message('PAUSED','click to resume');
+      Music.stop();
       return;
     }
     if ( Game.ticked ){
@@ -36,58 +47,78 @@ var Game = {
     // recurse...
     reqAnimFrame( Game.loop );
   },
-  setup: function(){
-    window.onblur = function(){
-      Game.paused = true;
-    };
 
-    Music.init();
-    Physics.init();
-    Render.init();
-
-    Music.play();
-
-    Game.dragStartMouse = new Vect( 0, 0 );
-    Game.dragStartPos = new Vect( 0, 0 );
-    Game.dragLastPos = new Vect( 0, 0 );
-    Game.bindEvents();
-
-    Game.load( level[0] );
-  },
   // render a level...
-  load: function( level ){
-
-    // render the playing field along hexgrid...
+  load: function( num ){
+    Physics.reset();
+    Music.play();
+    Render.fg.clear();
+    // read and bump the level number
+    num = Game.lvl = num || ++Game.lvl;
+    // load level data
+    Game.level = level[ num ];
+    // prepare the playing field along hexgrid...
     var rows = 11, cols, r = Physics.width/26, d = 2*r, h = 2*d/root3, x, y, obj;
     for ( var row = 0; row < rows; row++ ){
       cols = row % 2 ? 13 : 12;
       x = row % 2 ? r : d;
       y = h/2 + (3*h/4) * row;
-      if ( !level.field[ row ] ) break;
+      if ( !Game.level.field[ row ] ) break;
       for ( var col = 0; col < cols; col++ ){
-        if ( obj = level.field[ row ][ col ] ){
+        if ( obj = Game.level.field[ row ][ col ] ){
           new Physic( obj, x + d * col, y, r-1, true );
         }
       }
     }
-
-    // render the batters box
-    for ( var i = 0; i < level.balls.length; i++ ){
+    // prepare the batters box
+    for ( var i = 0; i < Game.level.balls.length; i++ ){
       new Physic(
-        level.balls[i],
+        Game.level.balls[i],
         r + r * 2 * i,
         Physics.height-r,
         r-1
       );
     }
+    // show a message...
+    Render.message('Level '+ num, 'click to start' );
+  },
+  // check the matter against the goal
+  solution: function( obj ){
+    // look for successful completion
+    var complete = true;
+    if ( Game.level.solve.fire > obj[ FIRE ] ){
+      complete = false;
+    }
+    if ( Game.level.solve.air > obj[ AIR ] ){
+      complete = false;
+    }
+    if ( Game.level.solve.water > obj[ WATER ] ){
+      complete = false;
+    }
+    if ( Game.level.solve.earth > obj[ EARTH ] ){
+      complete = false;
+    }
+    if ( complete === true ){
+      Game.paused = true;
+      Game.level.solved = true;
+      return;
+    }
+    // look for unresolvable conditions...
 
   },
 
   bindEvents: function() {
+    window.onblur = function(){
+      Game.paused = true;
+    };
+    // initialize interaction props
+    Game.dragStartMouse = new Vect( 0, 0 );
+    Game.dragStartPos = new Vect( 0, 0 );
+    Game.dragLastPos = new Vect( 0, 0 );
     // drag start
     Render.fg.elem.addEventListener('mousedown', function( e ) {
-      if ( Game.paused ){
-        Game.pause();
+      if ( Game.level.solved ){
+        Game.load();
       }
       var i = 0, len = Physics.bodies.length, body, a, b, c;
       if ( e.pageY > Physics.height - 200 ) {
@@ -106,12 +137,17 @@ var Game = {
               Game.dragStartPos.set( body.pos.x, body.pos.y );
               Game.dragLastPos.set( body.pos.x, body.pos.y );
               body.vel.x = body.vel.y = 0;
+              // unpause/resume
+              if ( Game.paused ){
+                Game.pause();
+              }
               return;
             }
           }
         }
       }
       Game.dragging = false;
+      Game.pause();
     }, false);
     // drag
     window.addEventListener('mousemove', function( e ) {
@@ -150,8 +186,8 @@ var Game = {
     dx = body.pos.x - Game.dragLastPos.x;
     dy = body.pos.y - Game.dragLastPos.y;
     body.vel.set( ( dx / dt ) || 0, ( dy / dt ) || 0 );
-    body.vel.x = body.vel.x > 0 ? Math.min( body.vel.x, 3 ) : Math.max( body.vel.x, -3 );
-    body.vel.y = body.vel.y > 0 ? Math.min( body.vel.y, 3 ) : Math.max( body.vel.y, -3 );
+    // body.vel.x = body.vel.x > 0 ? Math.min( body.vel.x, 3 ) : Math.max( body.vel.x, -3 );
+    // body.vel.y = body.vel.y > 0 ? Math.min( body.vel.y, 3 ) : Math.max( body.vel.y, -3 );
   }
 };
 
