@@ -5,7 +5,7 @@ var Game = {
     Render.init();
     Game.bindEvents();
     // begin the next level
-    Game.load();
+    Game.load( localStorage.getItem('level') || 0 );
     Music.play();
   },
   lvl: 0,
@@ -58,6 +58,7 @@ var Game = {
     num = Game.lvl = num || ++Game.lvl;
     // load level data
     Game.level = level[ num ];
+    localStorage.setItem( 'level', num );
     // prepare the playing field along hexgrid...
     var rows = 11, cols, r = Physics.width/26, d = 2*r, h = 2*d/root3, x, y, obj;
     for ( var row = 0; row < rows; row++ ){
