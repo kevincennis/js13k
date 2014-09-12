@@ -41,8 +41,11 @@ var Game = {
       Game.paused = true;
     };
 
+    Music.init();
     Physics.init();
     Render.init();
+
+    Music.play();
 
     Game.dragStartMouse = new Vect( 0, 0 );
     Game.dragStartPos = new Vect( 0, 0 );

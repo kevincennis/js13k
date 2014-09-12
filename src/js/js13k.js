@@ -7,4 +7,5 @@
 // @include render.js
 // @include canvas.js
 // @include level.js
+// @include music.js
 // @include outro.js
