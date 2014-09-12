@@ -206,10 +206,15 @@ var Music = {
   init: function() {
     if ( ac ) {
       this.ac = ac;
+      this.osc = this.ac.createOscillator();
       this.output = this.ac.createDynamicsCompressor();
       this.reverb = this.ac.createConvolver();
       this.reverb.buffer = this.createReverb( 2 );
       this.reverb.connect( this.output );
+
+      this.osc.frequency.value = 0;
+      this.osc.connect( this.output );
+      this.osc.start();
 
       this.kick.wet.connect( this.reverb );
       this.bass.wet.connect( this.reverb );
@@ -271,6 +276,16 @@ var Music = {
     this.kick.stop();
     this.pad1.stop();
     this.pad2.stop();
+  },
+
+  collide: function( start, end ) {
+    var start = Note.getFrequency( start ),
+      end = Note.getFrequency( end ),
+      now = this.ac.currentTime;
+    this.osc.frequency.cancelScheduledValues( now );
+    this.osc.frequency.setValueAtTime( start, now );
+    this.osc.frequency.linearRampToValueAtTime( end, now + 0.15 );
+    this.osc.frequency.linearRampToValueAtTime( 0, now + 0.151 );
   },
 
   createReverb: function( duration, decay ) {
