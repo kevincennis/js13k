@@ -68,22 +68,27 @@ var Physics = {
     switch ( a.mask | b.mask ){
       case FIRE | WATER:
       case AIR | EARTH:
+        Music.collide( 'G5', 'G4' );
         a.area( -depth );
         b.area( -depth );
         break;
       case FIRE | AIR:
+        Music.collide( 'G4', 'G5' );
         a.area( a.mask & FIRE ? +depth : -depth );
         b.area( b.mask & FIRE ? +depth : -depth );
         break;
       case EARTH | FIRE:
+        Music.collide( 'G4', 'G5' );
         a.area( a.mask & EARTH ? +depth : -depth );
         b.area( b.mask & EARTH ? +depth : -depth );
         break;
       case WATER | EARTH:
+        Music.collide( 'G4', 'G5' );
         a.area( a.mask & WATER ? +depth : -depth );
         b.area( b.mask & WATER ? +depth : -depth );
         break;
       case AIR | WATER:
+        Music.collide( 'G4', 'G5' );
         a.area( a.mask & AIR ? +depth : -depth );
         b.area( b.mask & AIR ? +depth : -depth );
         break;
