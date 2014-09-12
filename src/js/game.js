@@ -175,7 +175,7 @@ var Game = {
 
   release: function(){
     var now = Date.now(), body = Game.dragging, dt, dx, dy,
-      limit = 1, ratio = 1;
+      limit = 3, ratio = 1;
     if ( !Game.dragging ) {
       return;
     }
