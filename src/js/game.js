@@ -174,7 +174,8 @@ var Game = {
   },
 
   release: function(){
-    var now = Date.now(), body = Game.dragging, dt, dx, dy;
+    var now = Date.now(), body = Game.dragging, dt, dx, dy,
+      limit = 1, ratio = 1;
     if ( !Game.dragging ) {
       return;
     }
@@ -187,6 +188,15 @@ var Game = {
     dx = body.pos.x - Game.dragLastPos.x;
     dy = body.pos.y - Game.dragLastPos.y;
     body.vel.set( ( dx / dt ) || 0, ( dy / dt ) || 0 );
+
+    // speed limits
+    if ( Math.abs( body.vel.x ) > limit ) {
+      ratio = limit / Math.abs( body.vel.x );
+    } else if ( Math.abs( body.vel.y ) > 1 ) {
+      ratio = limit / Math.abs( body.vel.y );
+    }
+
+    body.vel.mult( ratio );
     // body.vel.x = body.vel.x > 0 ? Math.min( body.vel.x, 3 ) : Math.max( body.vel.x, -3 );
     // body.vel.y = body.vel.y > 0 ? Math.min( body.vel.y, 3 ) : Math.max( body.vel.y, -3 );
   }
