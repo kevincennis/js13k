@@ -275,11 +275,11 @@ var Music = {
 
   createReverb: function( duration, decay ) {
     var sr = ac.sampleRate,
-    len = sr * duration,
-    impulse = this.ac.createBuffer( 2, len, sr ),
-    impulseL = impulse.getChannelData( 0 ),
-    impulseR = impulse.getChannelData( 1 ),
-    i = 0;
+      len = sr * duration,
+      impulse = this.ac.createBuffer( 2, len, sr ),
+      impulseL = impulse.getChannelData( 0 ),
+      impulseR = impulse.getChannelData( 1 ),
+      i = 0;
 
   if ( !decay ) {
     decay = 2.0;
