@@ -6,6 +6,7 @@ var Game = {
     Game.bindEvents();
     // begin the next level
     Game.load();
+    Music.play();
   },
   lvl: 0,
   level: null,
@@ -15,7 +16,7 @@ var Game = {
       Game.paused = false;
       Game.ticked = 0;
       reqAnimFrame( Game.loop );
-      Music.play();
+      // Music.play();
     }
     else {
       Game.paused = true;
@@ -35,7 +36,7 @@ var Game = {
     }
     if ( Game.paused ){
       Render.message('PAUSED','click to resume');
-      Music.stop();
+      // Music.stop();
       return;
     }
     if ( Game.ticked ){
@@ -51,7 +52,7 @@ var Game = {
   // render a level...
   load: function( num ){
     Physics.reset();
-    Music.play();
+    // Music.play();
     Render.fg.clear();
     // read and bump the level number
     num = Game.lvl = num || ++Game.lvl;
