@@ -161,9 +161,9 @@ var Render = {
       ctx.strokeText( msg, x, y );
       // description...
       ctx.font = Physics.unit(3/4/2)+'px monospace';
-      ctx.fillText( desc1, x, y + Physics.unit(3/4) );
+      ctx.fillText( desc1 || '', x, y + Physics.unit(3/4) );
       ctx.font = Physics.unit(3/4/2)+'px monospace';
-      ctx.fillText( desc2, x, y + Physics.unit(5/4) );
+      ctx.fillText( desc2 || '', x, y + Physics.unit(5/4) );
     });
   },
   gradient: function( ctx, type, x, y, r ){
