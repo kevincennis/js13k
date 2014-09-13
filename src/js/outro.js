@@ -1,5 +1,0 @@
-Game.start();
-
-return Game;
-
-}));
