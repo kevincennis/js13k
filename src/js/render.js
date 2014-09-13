@@ -48,17 +48,18 @@ var Render = {
         border: '1px solid rgba(128,128,255,.5)',
         background: 'url('+ Render.hexgrid( Physics.width/26 ) +') repeat'
       });
-    // mini map
-    Render.map = new Canvas( document.body )
-      .size( Physics.width/8, Physics.height/8 )
-      .css({
-        position: 'fixed',
-        top: '10px',
-        left: ( Physics.width + 22 )+'px',
-        zIndex: 4,
-        border: '1px solid rgba(128,128,255,.5)',
-        background: 'rgba(8,0,16,.5)',
       });
+    // // mini map
+    // Render.map = new Canvas( document.body )
+    //   .size( Physics.width/8, Physics.height/8 )
+    //   .css({
+    //     position: 'fixed',
+    //     top: Physics.margin + 'px',
+    //     left: ( Physics.width + 22 )+'px',
+    //     zIndex: 4,
+    //     border: Physics.border + 'px solid rgba(128,128,255,.5)',
+    //     background: 'rgba(8,0,16,.5)',
+    //   });
     // solution tracker
     Render.goal = new Canvas( document.body )
       .size( Physics.width/8, Physics.height * 7/8 -10 )

@@ -269,12 +269,12 @@ var Physic = subclass({
         this.pos.x - this.r - 8, // x pos
         this.pos.y - this.r - 8 // y pos
       );
-      // update the minimap
-      Render.map.ctx.beginPath();
-      Render.map.ctx.arc( this.pos.x/8, this.pos.y/8, this.r/8, 0, 2 * Math.PI, false);
-      Render.map.ctx.fillStyle = this.color;
-      Render.map.ctx.fill();
-      Render.map.ctx.closePath();
+      // // update the minimap
+      // Render.map.ctx.beginPath();
+      // Render.map.ctx.arc( this.pos.x/8, this.pos.y/8, this.r/8, 0, 2 * Math.PI, false);
+      // Render.map.ctx.fillStyle = this.color;
+      // Render.map.ctx.fill();
+      // Render.map.ctx.closePath();
 
       // update the background effects
       Render.fx.ctx.drawImage(

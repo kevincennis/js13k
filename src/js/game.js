@@ -25,7 +25,7 @@ var Game = {
   step: function( delta ){
     Render.fg.clear();
     Render.fx.fill();
-    Render.map.clear();
+    // Render.map.clear();
     // update Physics calculations
     Physics.motion( delta );
   },
