@@ -219,11 +219,13 @@ var Music = {
       this.kick.wet.connect( this.reverb );
       this.bass.wet.connect( this.reverb );
       this.lead.wet.connect( this.reverb );
+      this.counterpoint.wet.connect( this.reverb );
       this.pad1.wet.connect( this.reverb );
       this.pad2.wet.connect( this.reverb );
       this.kick.dry.connect( this.output );
       this.bass.dry.connect( this.output );
       this.lead.dry.connect( this.output );
+      this.counterpoint.dry.connect( this.output );
       this.pad1.dry.connect( this.output );
       this.pad2.dry.connect( this.output );
 
@@ -241,6 +243,9 @@ var Music = {
       this.lead.gain.gain.value = 0.35;
       this.lead.wet.gain.value = 1.5;
 
+      this.counterpoint.smoothing = 0.06;
+      this.counterpoint.gain.gain.value = 0.22;
+
       this.pad1.gain.gain.value = 0.25;
       this.pad1.wet.gain.value = 3;
       this.pad1.waveType = 'sawtooth';
@@ -251,9 +256,11 @@ var Music = {
 
       this.kick.waveType = 'sine';
       this.kick.smoothing = 0.8;
-      this.kick.gain.gain.value = 2.8;
+      this.kick.gain.gain.value = 2.0;
       this.kick.bass.frequency.value = 60;
       this.kick.bass.gain.value = 10;
+      this.kick.mid.frequency.value = 100;
+      this.kick.mid.gain.value = 5;
       this.kick.wet.gain.value = 0.3;
     }
   },
@@ -263,6 +270,7 @@ var Music = {
     if ( this.ac ) {
       now = this.ac.currentTime;
       this.lead.play( now );
+      this.counterpoint.play( now + ( 60 / tempo * 16 ) );
       this.bass.play( now + ( 60 / tempo * 16 ) );
       this.kick.play( now + ( 60 / tempo * 16 ) );
       this.pad1.play( now + ( 60 / tempo * 16 ) );
@@ -272,6 +280,7 @@ var Music = {
 
   stop: function() {
     this.lead.stop();
+    this.counterpoint.stop();
     this.bass.stop();
     this.kick.stop();
     this.pad1.stop();
@@ -380,6 +389,20 @@ var Music = {
     'B4 e',
     'A4 e',
     'G4 e',
+  ]),
+
+  counterpoint: new Sequence( ac, tempo, [
+    'E4 3',
+    'F#4 e',
+    'D4 3.5',
+    'B3 e',
+    'G4 3.5',
+    'E4 e',
+    'B4 h',
+    'A4 q',
+    'G4  e',
+    'F#4 e',
+    'E4 e'
   ]),
 
   kick: new Sequence( ac, tempo, [
