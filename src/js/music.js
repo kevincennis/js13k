@@ -207,13 +207,25 @@ var Music = {
     if ( ac ) {
       this.ac = ac;
       this.osc = this.ac.createOscillator();
-      this.output = this.ac.createDynamicsCompressor();
+      this.compressor = this.ac.createDynamicsCompressor();
+      this.output = this.ac.createGain();
+      this.output.connect( this.ac.destination );
+      this.output.gain.value = 0.5;
+
       this.reverb = this.ac.createConvolver();
       this.reverb.buffer = this.createReverb( 2 );
-      this.reverb.connect( this.output );
+      this.reverb.connect( this.compressor );
+
+      this.collision1.dry.connect( this.output );
+      this.collision1.gain.gain.value = 0.4;
+      this.collision1.loop = false;
+
+      this.collision2.dry.connect( this.output );
+      this.collision2.gain.gain.value = 0.4;
+      this.collision2.loop = false;
 
       this.osc.frequency.value = 0;
-      this.osc.connect( this.output );
+      this.osc.connect( this.compressor );
       this.osc.start();
 
       this.kick.wet.connect( this.reverb );
@@ -222,16 +234,16 @@ var Music = {
       this.counterpoint.wet.connect( this.reverb );
       this.pad1.wet.connect( this.reverb );
       this.pad2.wet.connect( this.reverb );
-      this.kick.dry.connect( this.output );
-      this.bass.dry.connect( this.output );
-      this.lead.dry.connect( this.output );
-      this.counterpoint.dry.connect( this.output );
-      this.pad1.dry.connect( this.output );
-      this.pad2.dry.connect( this.output );
+      this.kick.dry.connect( this.compressor );
+      this.bass.dry.connect( this.compressor );
+      this.lead.dry.connect( this.compressor );
+      this.counterpoint.dry.connect( this.compressor );
+      this.pad1.dry.connect( this.compressor );
+      this.pad2.dry.connect( this.compressor );
 
-      this.output.ratio.value = 4;
-      this.output.threshold.value = -12;
-      this.output.connect( this.ac.destination );
+      this.compressor.ratio.value = 4;
+      this.compressor.threshold.value = -12;
+      this.compressor.connect( this.output );
 
       this.bass.staccato = 0.25;
       this.bass.waveType = 'sawtooth';
@@ -287,14 +299,14 @@ var Music = {
     this.pad2.stop();
   },
 
-  collide: function( start, end ) {
-    var start = Note.getFrequency( start ),
-      end = Note.getFrequency( end ),
-      now = this.ac.currentTime;
-    this.osc.frequency.cancelScheduledValues( now );
-    this.osc.frequency.setValueAtTime( start, now );
-    this.osc.frequency.linearRampToValueAtTime( end, now + 0.15 );
-    this.osc.frequency.linearRampToValueAtTime( 0, now + 0.151 );
+  collide: function( descend ) {
+    this.collision1.stop();
+    this.collision2.stop();
+    if ( descend ) {
+      this.collision2.play();
+    } else {
+      this.collision1.play();
+    }
   },
 
   createReverb: function( duration, decay ) {
@@ -426,6 +438,18 @@ var Music = {
     'B3 2',
     'D4 2',
     'C4 0.5'
+  ]),
+
+  collision1: new Sequence( ac, 220, [
+    'G3 s',
+    'D4 s',
+    'G4 s'
+  ]),
+
+  collision2: new Sequence( ac, 220, [
+    'G4 s',
+    'D4 s',
+    'G3 s'
   ])
 
 };
