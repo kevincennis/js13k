@@ -68,14 +68,16 @@
 
   // create a new Sequence
   function Sequence( ac, tempo, arr ) {
-    this.ac = ac || new AudioContext();
-    this.createFxNodes();
-    this.tempo = tempo || 120;
-    this.loop = true;
-    this.smoothing = 0;
-    this.staccato = 0;
-    this.notes = [];
-    this.push.apply( this, arr || [] );
+    if ( ac ) {
+      this.ac = ac;
+      this.createFxNodes();
+      this.tempo = tempo || 120;
+      this.loop = true;
+      this.smoothing = 0;
+      this.staccato = 0;
+      this.notes = [];
+      this.push.apply( this, arr || [] );
+    }
   }
 
   // create gain and EQ nodes, then connect 'em
@@ -195,7 +197,9 @@
 
 }( typeof window !== 'undefined' ? window : this ) );
 
-var ac, tempo = 128;
+
+// audiocontext, beats per minute, overall game volume
+var ac, tempo = 128, volume = 0.5;
 
 if ( window.AudioContext || window.webkitAudioContext ) {
  ac = new ( window.AudioContext || window.webkitAudioContext )();
@@ -210,7 +214,7 @@ var Music = {
       this.compressor = this.ac.createDynamicsCompressor();
       this.output = this.ac.createGain();
       this.output.connect( this.ac.destination );
-      this.output.gain.value = 0.5;
+      this.output.gain.value = volume;
 
       this.reverb = this.ac.createConvolver();
       this.reverb.buffer = this.createReverb( 2 );
@@ -291,21 +295,37 @@ var Music = {
   },
 
   stop: function() {
-    this.lead.stop();
-    this.counterpoint.stop();
-    this.bass.stop();
-    this.kick.stop();
-    this.pad1.stop();
-    this.pad2.stop();
+    if ( this.ac ) {
+      this.lead.stop();
+      this.counterpoint.stop();
+      this.bass.stop();
+      this.kick.stop();
+      this.pad1.stop();
+      this.pad2.stop();
+    }
+  },
+
+  mute: function() {
+    if ( this.ac ) {
+      if ( this.muted ) {
+        this.muted = false;
+        this.output.gain.value = volume;
+      } else {
+        this.muted = true;
+        this.output.gain.value = 0;
+      }
+    }
   },
 
   collide: function( descend ) {
-    this.collision1.stop();
-    this.collision2.stop();
-    if ( descend ) {
-      this.collision2.play();
-    } else {
-      this.collision1.play();
+    if ( this.ac ) {
+      this.collision1.stop();
+      this.collision2.stop();
+      if ( descend ) {
+        this.collision2.play();
+      } else {
+        this.collision1.play();
+      }
     }
   },
 
@@ -317,14 +337,14 @@ var Music = {
       impulseR = impulse.getChannelData( 1 ),
       i = 0;
 
-  if ( !decay ) {
-    decay = 2.0;
-  }
-  for ( ; i < len; ++i ) {
-    impulseL[ i ] = ( Math.random() * 2 - 1 ) * Math.pow( 1 - i / len, decay );
-    impulseR[ i ] = ( Math.random() * 2 - 1 ) * Math.pow( 1 - i / len, decay );
-  }
-  return impulse;
+    if ( !decay ) {
+      decay = 2.0;
+    }
+    for ( ; i < len; ++i ) {
+      impulseL[ i ] = ( Math.random() * 2 - 1 ) * Math.pow( 1 - i / len, decay );
+      impulseR[ i ] = ( Math.random() * 2 - 1 ) * Math.pow( 1 - i / len, decay );
+    }
+    return impulse;
   },
 
   bass: new Sequence( ac, tempo, [
