@@ -1,9 +1,6 @@
 var level = [];
 
 level[1] = {
-  balls: [
-    FIRE, AIR, WATER, EARTH
-  ],
   field: [
     [],
     [ 0, 0, 0, 0, 0, 0, FIRE ],
@@ -23,9 +20,6 @@ level[1] = {
 };
 
 level[2] = {
-  balls: [
-    FIRE, AIR, WATER, EARTH
-  ],
   field: [
     [],
     [ 0, 0, 0, 0, 0, 0, AIR ],
@@ -45,9 +39,6 @@ level[2] = {
 };
 
 level[3] = {
-  balls: [
-    FIRE, AIR, WATER, EARTH
-  ],
   field: [
     [],
     [ 0, 0, 0, WATER, WATER, WATER, WATER, WATER, WATER, WATER ],
@@ -67,9 +58,6 @@ level[3] = {
 };
 
 level[4] = {
-  balls: [
-    FIRE, AIR, WATER, EARTH
-  ],
   field: [
     [],
     [ 0, 0, 0, EARTH, EARTH, EARTH, EARTH, EARTH, EARTH, EARTH ],
@@ -81,9 +69,28 @@ level[4] = {
     [ 0, 0, 0, 0, 0, 0, EARTH ],
   ],
   solve: {
-    fire: Physics.unit2(10),
+    fire: 0,
     air: 0,
-    water: Physics.unit2(9),
+    water: Physics.unit2(19),
+    earth: 0
+  }
+};
+
+level[5] = {
+  field: [
+    [ 0, 0, 0, 0, EARTH, 0, 0, EARTH ],
+    [ 0, 0, 0, 0, EARTH, WATER, WATER, EARTH ],
+    [ 0, 0, 0, 0, EARTH, 0, 0, EARTH ],
+    [ 0, 0, 0, 0, EARTH, 0, 0, EARTH ],
+    [ 0, 0, 0, 0, EARTH, 0, 0, EARTH ],
+    [ 0, 0, 0, 0, EARTH, 0, 0, EARTH ],
+    [ 0, 0, 0, 0, EARTH, 0, 0, EARTH ],
+    [ 0, 0, 0, 0, EARTH, 0, 0, EARTH ],
+  ],
+  solve: {
+    fire: Physics.unit2(18),
+    air: 0,
+    water: Physics.unit2(1),
     earth: 0
   }
 };

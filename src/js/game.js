@@ -57,6 +57,9 @@ var Game = {
     Render.fg.clear();
     // read and bump the level number
     num = Game.lvl = num || ++Game.lvl;
+    if ( !level[ num ] ){
+      num = Game.lvl = 1;
+    }
     // load level data
     Game.level = level[ num ];
     localStorage.setItem( 'level', num );
@@ -75,9 +78,10 @@ var Game = {
       }
     }
     // prepare the batters box
-    for ( var i = 0; i < Game.level.balls.length; i++ ){
+    var ammo = [ FIRE, AIR, WATER, EARTH ];
+    for ( var i = 0; i < ammo.length; i++ ){
       new Physic(
-        Game.level.balls[i],
+        ammo[i],
         Physics.unit( i + 5 )+1, // + Physics.r,
         Physics.height + Physics.unitH(.75)-1,
         Physics.r - 1
@@ -85,7 +89,7 @@ var Game = {
     }
     Game.step(0);
     // show a message...
-    Render.message('READY', 'click to start' );
+    Render.message('READY', 'flick to combine', 'reload to retry' );
   },
   // check the matter against the goal
   solution: function( obj ){
