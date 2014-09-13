@@ -118,7 +118,7 @@
   // returns an AudioContext timestamp of when the note will *end*
   Sequence.prototype.scheduleNote = function( index, when ) {
     var duration = 60 / this.tempo * this.notes[ index ].duration,
-      cutoff = duration * ( 1 - ( this.staccato || 0 ) );
+      cutoff = duration * ( 1 - ( this.staccato || 0.00000000001 ) );
 
     this.setFrequency( this.notes[ index ].frequency, when );
 
