@@ -285,12 +285,13 @@ var Music = {
     var now, delay;
     if ( this.ac ) {
       now = this.ac.currentTime;
+      delay = now + ( 60 / tempo * 16 );
       this.lead.play( now );
-      this.counterpoint.play( now + ( 60 / tempo * 16 ) );
-      this.bass.play( now + ( 60 / tempo * 16 ) );
-      this.kick.play( now + ( 60 / tempo * 16 ) );
-      this.pad1.play( now + ( 60 / tempo * 16 ) );
-      this.pad2.play( now + ( 60 / tempo * 16 ) );
+      this.counterpoint.play( delay );
+      this.bass.play( delay );
+      this.kick.play( delay );
+      this.pad1.play( delay );
+      this.pad2.play( delay );
     }
   },
 
