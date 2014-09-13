@@ -7,8 +7,30 @@ EARTH = 8;
 
 // physics manager
 var Physics = {
-  width: 780,
-  height: 860,
+  r: 30,
+  w: 13,
+  h: 8,
+  margin: 10,
+  border: 1,
+  // multiply by units of circular diameter
+  unit: function( x ){
+    return 2 * Physics.r * ( x || 1 );
+  },
+  // multiply by units of triangular height
+  unitH: function( x ){
+    return ( Physics.unit(2) / root3 ) * ( x || 1 );
+  },
+  // multiply by units of circular area
+  unit2: function( x ){
+    var r = Physics.r - 1; // slightly smaller
+    return r * r * Math.PI * ( x || 1 );
+  },
+  resize: function(){
+    Physics.width = Physics.unit( Physics.w );
+    Physics.top = Physics.unitH(3/4) + Physics.margin + Physics.border;
+    Physics.height = Physics.unitH( Physics.h );
+    Physics.left = Physics.margin + Physics.border;
+  },
   reset: function(){
     Physics.bodies = [];
   },
@@ -38,7 +60,9 @@ var Physics = {
         obj1.worlds_collide();
         obj1.step( dt );
         obj1.draw( Render.fg.ctx );
-        Physics.matter[ obj1.mask ] += obj1.area();
+        if ( obj1.active ){
+          Physics.matter[ obj1.mask ] += obj1.area();
+        }
       }
     }
     Game.solution( Physics.matter );
@@ -211,7 +235,7 @@ var Physic = subclass({
       this.pos.add( this.vel.clone().mult( dt ) );
     }
     // make a "launching" body active once it enters the "real" world
-    if ( this.launching && this.pos.y < Physics.height - 200 - this.r ) {
+    if ( this.launching && this.pos.y < Physics.height - this.r ) {
       this.active = true;
       this.launching = false;
     }
@@ -232,7 +256,7 @@ var Physic = subclass({
       this.force.y = this.r - this.pos.y;
     }
     // south (doesn't apply to launching bodies)
-    var south = this.launching ? Physics.height : Physics.height - 200;
+    var south = this.launching ? Physics.height + Physics.unitH() : Physics.height;
     if ( this.pos.y > south - this.r ){
       this.vel.y = -Math.abs( this.vel.y );
       this.force.y = south - this.r - this.pos.y;

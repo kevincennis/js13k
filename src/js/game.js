@@ -2,6 +2,7 @@
 var Game = {
   start: function(){
     Music.init();
+    Physics.resize();
     Render.init();
     Game.bindEvents();
     // begin the next level
@@ -60,15 +61,16 @@ var Game = {
     Game.level = level[ num ];
     localStorage.setItem( 'level', num );
     // prepare the playing field along hexgrid...
-    var rows = 11, cols, r = Physics.width/26, d = 2*r, h = 2*d/root3, x, y, obj;
+    var rows = Physics.h, cols = Physics.w-1,
+      h = Physics.unit(2)/root3, x, y, obj;
     for ( var row = 0; row < rows; row++ ){
-      cols = row % 2 ? 13 : 12;
-      x = row % 2 ? r : d;
-      y = h/2 + (3*h/4) * row;
+      cols += ( row % 2 ? +1 : -1 );
+      x = Physics.unit( row % 2 ? .5 : 1 );
+      y = h/2 + ( 3 * h/4 ) * row;
       if ( !Game.level.field[ row ] ) break;
       for ( var col = 0; col < cols; col++ ){
         if ( obj = Game.level.field[ row ][ col ] ){
-          new Physic( obj, x + d * col, y, r-1, true );
+          new Physic( obj, x + Physics.unit( col ), y, Physics.r-1, true );
         }
       }
     }
@@ -76,16 +78,18 @@ var Game = {
     for ( var i = 0; i < Game.level.balls.length; i++ ){
       new Physic(
         Game.level.balls[i],
-        r + r * 2 * i,
-        Physics.height-r,
-        r-1
+        Physics.unit( i + 5 )+1, // + Physics.r,
+        Physics.height + Physics.unitH(.75)-1,
+        Physics.r - 1
       );
     }
+    Game.step(0);
     // show a message...
-    Render.message('Level '+ num, 'click to start' );
+    Render.message('READY', 'click to start' );
   },
   // check the matter against the goal
   solution: function( obj ){
+    Render.status();
     // look for successful completion
     var complete = true;
     if ( Game.level.solve.fire > obj[ FIRE ] ){
@@ -123,19 +127,19 @@ var Game = {
         Game.load();
       }
       var i = 0, len = Physics.bodies.length, body, a, b, c;
-      if ( e.pageY > Physics.height - 200 ) {
+      if ( e.pageY > Physics.height ) {
         for ( ; i < len; ++i ) {
           body = Physics.bodies[ i ];
           if ( body && !body.active ) {
-            a = ( e.pageX - 10 ) - body.pos.x;
-            b = ( e.pageY - 10 ) - body.pos.y;
+            a = ( e.pageX - Physics.left ) - body.pos.x;
+            b = ( e.pageY - Physics.top ) - body.pos.y;
             c = a * a + b * b;
             if ( c <= body.r * body.r ) {
               body.launching = false;
               Game.dragging = body;
               Game.dragLastTime = Date.now();
               Game.dragCurrTime = Date.now();
-              Game.dragStartMouse.set( e.pageX - 10, e.pageY - 10 );
+              Game.dragStartMouse.set( e.pageX - Physics.left, e.pageY - Physics.top );
               Game.dragStartPos.set( body.pos.x, body.pos.y );
               Game.dragLastPos.set( body.pos.x, body.pos.y );
               body.vel.x = body.vel.y = 0;
@@ -156,16 +160,16 @@ var Game = {
       var body, dt, dx, dy;
       if ( body = Game.dragging ) {
         dt = Date.now() - Game.dragTime;
-        dx = ( e.pageX - 10 ) - Game.dragStartMouse.x;
-        dy = ( e.pageY - 10 ) - Game.dragStartMouse.y;
+        dx = ( e.pageX - Physics.left ) - Game.dragStartMouse.x;
+        dy = ( e.pageY - Physics.top ) - Game.dragStartMouse.y;
         Game.dragLastTime = Game.dragCurrTime;
         Game.dragCurrTime = Date.now();
         Game.dragLastPos.set( body.pos.x, body.pos.y );
         body.pos.set(
           Math.max( body.r, Math.min( Physics.width - body.r, Game.dragStartPos.x + dx ) ),
-          Math.min( Physics.height - body.r, Game.dragStartPos.y + dy )
+          Math.min( Physics.height + Physics.unitH(1.5) - body.r, Game.dragStartPos.y + dy )
         );
-        if ( body.pos.y < Physics.height - 200 ){
+        if ( body.pos.y < Physics.height ){
           Game.release();
         }
       }

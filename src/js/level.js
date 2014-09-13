@@ -18,7 +18,7 @@ level[1] = {
     fire: 0,
     air: 0,
     water: 0,
-    earth: Math.floor( 29*29*Math.PI*18.5 )
+    earth: Physics.unit2(18)
   }
 };
 
@@ -37,7 +37,7 @@ level[2] = {
     [ 0, 0, 0, AIR, AIR, AIR, AIR, AIR, AIR, AIR ],
   ],
   solve: {
-    fire: Math.floor( 29*29*Math.PI*23.5 ),
+    fire: Physics.unit2(23),
     air: 0,
     water: 0,
     earth: 0
@@ -59,8 +59,8 @@ level[3] = {
     [ 0, 0, 0, 0, 0, 0, WATER ],
   ],
   solve: {
-    fire: 0,
-    air: 1e9,
+    fire: Physics.unit2(20),
+    air: 0,
     water: 0,
     earth: 0
   }
@@ -81,9 +81,9 @@ level[4] = {
     [ 0, 0, 0, 0, 0, 0, EARTH ],
   ],
   solve: {
-    fire: 1e9,
+    fire: Physics.unit2(10),
     air: 0,
-    water: 0,
+    water: Physics.unit2(9),
     earth: 0
   }
 };

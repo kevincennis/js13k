@@ -23,31 +23,34 @@ var Render = {
     //   }).draw( Render.starfield );
     // background effects
     Render.fx = new Canvas( document.body )
-      .size( Physics.width, Physics.height-200 )
+      .size( Physics.width, Physics.height )
       .css({
         position: 'absolute',
-        top: '10px',
-        left: '10px',
+        top: Physics.top + 'px',
+        left: Physics.left + 'px',
         zIndex: 1,
-        border: '1px solid rgba(128,128,255,.5)',
-        marginBottom: '10px'
+        border: Physics.border + 'px solid rgba(128,128,255,.5)',
+        marginBottom: Physics.margin + 'px',
+        background: 'url('+ Render.hexgrid( Physics.r ).url() +') repeat'
       })
-      .set({
-        fillStyle: 'rgba(0,0,0,.25)'
+      // .set({
+      //   fillStyle: 'rgba(0,0,0,.25)'
+      // })
+      .draw(function( ctx ){
+        ctx.fillStyle = ctx.createPattern( Render.hexgrid( Physics.r ).elem, 'repeat' );
       })
       .path()
       .rect();
     // foreground
     Render.fg = new Canvas( document.body )
-      .size( Physics.width, Physics.height )
+      .size( Physics.width, Physics.height + Physics.unitH(1.5) )
       .css({
         position: 'absolute',
-        top: '10px',
-        left: '10px',
+        top: Physics.top + 'px',
+        left: Physics.left + 'px',
         zIndex: 3,
-        border: '1px solid rgba(128,128,255,.5)',
-        background: 'url('+ Render.hexgrid( Physics.width/26 ) +') repeat'
-      });
+        border: Physics.border + 'px solid rgba(128,128,255,0)',
+        // background: 'url('+ Render.hexgrid( Physics.r ).url() +') repeat'
       });
     // // mini map
     // Render.map = new Canvas( document.body )
@@ -61,27 +64,94 @@ var Render = {
     //     background: 'rgba(8,0,16,.5)',
     //   });
     // solution tracker
-    Render.goal = new Canvas( document.body )
-      .size( Physics.width/8, Physics.height * 7/8 -10 )
+    Render.header = new Canvas( document.body )
+      .size( Physics.width, Physics.unitH() )
       .css({
         position: 'fixed',
-        top: Math.round( Physics.height/8 + 20 )+'px',
-        left: ( Physics.width + 22 )+'px',
+        top: Physics.margin + 'px',
+        left: Physics.left + 'px',
         zIndex: 4,
-        border: '1px solid rgba(128,128,255,.5)',
-        background: 'rgba(8,0,16,.5)',
+        // border: Physics.border + 'px solid rgba(128,128,255,.5)',
+
+      });
+  },
+  status: function(){
+    Render.header.clear().draw(function(ctx){
+        // styles
+        ctx.font = Physics.unit(3/4) +'px monospace';
+        ctx.textAlign = 'left';
+        ctx.textBaseline = 'top';
+        ctx.fillStyle = 'rgba(128,128,255,.75)';
+        ctx.lineWidth = 1.5;
+        ctx.strokeStyle = 'rgba(128,128,255,1)';
+        // refs
+        var title = 'CRASIS/'+ Game.lvl, x = 0, y = 0,
+        level = 'LEVEL'+ Game.lvl,
+        xl = Physics.width - ctx.measureText(level).width;
+        // title...
+        ctx.fillText( title, x, y );
+        ctx.strokeText( title, x, y );
+        // level...
+        // ctx.fillText( level, xl, y );
+        // ctx.strokeText( level, xl, y );
+
+        // solution...
+        var y = 26, h = 2, left = 240, width = Physics.width - left, offset,
+        total = Physics.unit2(28);
+
+        ctx.fillStyle = props[ FIRE ].color;
+        offset = ( Game.level.solve.fire/total ) * width;
+        ctx.fillRect( left, y, offset, h );
+        left += offset;
+
+        ctx.fillStyle = props[ AIR ].color;
+        offset = ( Game.level.solve.air/total ) * width;
+        ctx.fillRect( left, y, offset, h );
+        left += offset;
+
+        ctx.fillStyle = props[ WATER ].color;
+        offset = ( Game.level.solve.water/total ) * width;
+        ctx.fillRect( left, y, offset, h );
+        left += offset;
+
+        ctx.fillStyle = props[ EARTH ].color;
+        offset = ( Game.level.solve.earth/total ) * width;
+        ctx.fillRect( left, y, offset, h );
+
+        // current progress
+        var y = 32, h = 6, left = 240, width = Physics.width - left, offset;
+
+        ctx.fillStyle = props[ FIRE ].color;
+        offset = ( Physics.matter[ FIRE ]/total ) * width;
+        ctx.fillRect( left, y, offset, h );
+        left += offset;
+
+        ctx.fillStyle = props[ AIR ].color;
+        offset = ( Physics.matter[ AIR ]/total ) * width;
+        ctx.fillRect( left, y, offset, h );
+        left += offset;
+
+        ctx.fillStyle = props[ WATER ].color;
+        offset = ( Physics.matter[ WATER ]/total ) * width;
+        ctx.fillRect( left, y, offset, h );
+        left += offset;
+
+        ctx.fillStyle = props[ EARTH ].color;
+        offset = ( Physics.matter[ EARTH ]/total ) * width;
+        ctx.fillRect( left, y, offset, h );
+
       });
   },
   message: function( msg, desc ){
     Render.fg.draw(function( ctx ){
       // dimesnions...
-      var x = Physics.width/2, y = ( Physics.height - 200 )/2,
-      w = Physics.width, h = Physics.height - 200;
+      var x = Physics.width/2, y = ( Physics.height )/2,
+      w = Physics.width, h = Physics.height;
       // background knockout...
-      ctx.fillStyle = 'rgba(8,0,16,.5)';
+      ctx.fillStyle = 'rgba(8,0,16,.75)';
       ctx.fillRect( x - w/2, y-h/2, w, h );
       // headline...
-      ctx.font = '48px monospace';
+      ctx.font = Physics.unit(3/4)+'px monospace';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.fillStyle = 'rgba(128,128,255,.75)';
@@ -90,8 +160,8 @@ var Render = {
       ctx.strokeStyle = 'rgba(128,128,255,1)';
       ctx.strokeText( msg, x, y );
       // description...
-      ctx.font = '18px monospace';
-      ctx.fillText( desc, x, y + 36 );
+      ctx.font = Physics.unit(3/4/2)+'px monospace';
+      ctx.fillText( desc, x, y + Physics.unit(3/4) );
     });
   },
   gradient: function( ctx, type, x, y, r ){
@@ -121,10 +191,16 @@ var Render = {
     return new Canvas()
       .size( Math.floor( diameter ), Math.floor( height ) )
       .set({
+        globalAlpha: .25,
+        fillStyle: 'rgba(0,0,0,1)'
+      })
+      .rect()
+      .fill()
+      .set({
         lineWidth: 1,
         lineCap: 'square',
-        strokeStyle: 'rgba(128,128,255,.25)',
-        fillStyle: 'rgba(128,128,255,.25)'
+        strokeStyle: 'rgba(128,128,255,.5)',
+        fillStyle: 'rgba(128,128,255,.5)'
       })
       .path()
       .move( d0, h0 )
@@ -146,8 +222,7 @@ var Render = {
       .move( d100, h0 ).circ( r )
       .move( d100, h50 ).circ( r )
       .move( d100, h100 ).circ( r )
-      .fill()
-      .url();
+      .fill();
   },
   starfield: function( ctx ){
       this.path().set({ fillStyle: '#FFF' });
