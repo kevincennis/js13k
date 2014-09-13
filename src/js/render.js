@@ -29,7 +29,7 @@ var Render = {
         top: Physics.top + 'px',
         left: Physics.left + 'px',
         zIndex: 1,
-        border: Physics.border + 'px solid rgba(128,128,255,.5)',
+        border: Physics.border + 'px solid rgba(128,128,255,.75)',
         marginBottom: Physics.margin + 'px',
         background: 'url('+ Render.hexgrid( Physics.r ).url() +') repeat'
       })
@@ -142,7 +142,7 @@ var Render = {
 
       });
   },
-  message: function( msg, desc ){
+  message: function( msg, desc1, desc2 ){
     Render.fg.draw(function( ctx ){
       // dimesnions...
       var x = Physics.width/2, y = ( Physics.height )/2,
@@ -161,7 +161,9 @@ var Render = {
       ctx.strokeText( msg, x, y );
       // description...
       ctx.font = Physics.unit(3/4/2)+'px monospace';
-      ctx.fillText( desc, x, y + Physics.unit(3/4) );
+      ctx.fillText( desc1, x, y + Physics.unit(3/4) );
+      ctx.font = Physics.unit(3/4/2)+'px monospace';
+      ctx.fillText( desc2, x, y + Physics.unit(5/4) );
     });
   },
   gradient: function( ctx, type, x, y, r ){
@@ -191,7 +193,7 @@ var Render = {
     return new Canvas()
       .size( Math.floor( diameter ), Math.floor( height ) )
       .set({
-        globalAlpha: .25,
+        globalAlpha: .2,
         fillStyle: 'rgba(0,0,0,1)'
       })
       .rect()
@@ -199,8 +201,8 @@ var Render = {
       .set({
         lineWidth: 1,
         lineCap: 'square',
-        strokeStyle: 'rgba(128,128,255,.5)',
-        fillStyle: 'rgba(128,128,255,.5)'
+        strokeStyle: 'rgba(128,128,255,.25)',
+        fillStyle: 'rgba(128,128,255,.25)'
       })
       .path()
       .move( d0, h0 )

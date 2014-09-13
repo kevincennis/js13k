@@ -11,7 +11,7 @@ var Physics = {
   w: 13,
   h: 8,
   margin: 10,
-  border: 1,
+  border: 2,
   // multiply by units of circular diameter
   unit: function( x ){
     return 2 * Physics.r * ( x || 1 );
